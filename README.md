@@ -9,6 +9,7 @@ Directories are organized as numbered steps, with different versions indexed wit
 `01_Init_Script` has the installation scripts needed to load core dependencies on blank installs
 
 >Shell scripts are copied to the Jetson Nano via `scp` (secure copy) using SSH in terminal. Commands are used as follows:
+
 >`% scp raivShell.sh jt@aotunano.local:Desktop/`
 
 `02_Backup_IMG` has full OS snapshots of different "personalized" installs, with and without core dependencies
