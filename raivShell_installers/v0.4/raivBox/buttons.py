@@ -83,14 +83,19 @@ try:
             if curr2value == 0:
                 playing = 1
                 print('Playing Recorded Audio')
-                if os.path.exists(OUTPUT_PATH):
+                if os.path.exists('audio/output.wav'):
                     play = subprocess.Popen(
                         [play1cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
-                else:
+                elif os.path.exists('audio/input.wav'):
                     play = subprocess.Popen(
                         [play2cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
+                else:
+                    pass
             if playing == 1 and curr2value == 1:
-                play.send_signal(signal.SIGINT)
+                try:
+                    play.send_signal(signal.SIGINT)
+                except:
+                    pass
                 playing = 0
                 print('Audio Stopped')
             prev2value = curr2value
