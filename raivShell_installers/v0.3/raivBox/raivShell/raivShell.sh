@@ -24,7 +24,7 @@ sudo apt install vino ; mkdir -p ~/.config/autostart ; cp /usr/share/application
 gsettings set org.gnome.Vino prompt-enabled false ; gsettings set org.gnome.Vino require-encryption false
 gsettings set org.gnome.Vino authentication-methods "['vnc']" ; gsettings set org.gnome.Vino vnc-password $(echo -n "$PASS"|base64) ; clear
 
-echo '--Correcting VNC Settings--' ; echo ; echo ; sleep 2 ; cd /etc/X11/
+echo '--Adjusting VNC Settings--' ; echo ; echo ; sleep 2 ; cd /etc/X11/
 echo | sudo tee -a xorg.conf ; echo 'Section "Monitor"' | sudo tee -a xorg.conf ; echo '    Identifier "DSI-0"' | sudo tee -a xorg.conf
 echo '    Option    "Ignore"' | sudo tee -a xorg.conf ; echo "EndSection" | sudo tee -a xorg.conf ; echo | sudo tee -a xorg.conf
 echo 'Section "Screen"' | sudo tee -a xorg.conf ; echo '    Identifier  "Default Screen"' | sudo tee -a xorg.conf
@@ -32,10 +32,6 @@ echo '    Monitor "Configured Monitor"' | sudo tee -a xorg.conf ; echo '    Devi
 echo '    SubSection "Display"' | sudo tee -a xorg.conf ; echo "        Depth   24" | sudo tee -a xorg.conf
 echo "        Virtual 1280 720" | sudo tee -a xorg.conf ; echo "    EndSubSection" | sudo tee -a xorg.conf
 echo "EndSection" | sudo tee -a xorg.conf ; clear
-
-# echo "--Setting Up Automatic Login for $USER--" ; echo ; echo ; sleep 2
-# cd ~/etc/lightdm/lightdm.conf.d/ ; echo "autologin-user=$USER" | sudo tee -a 50-nvidia.conf
-# echo "autologin-user-timeout=0" | sudo tee -a 50-nvidia.conf ; cd ~ ; clear
 
 echo '--Purging Bloatware--' ; echo ; echo ; sleep 2 ; cd ~
 yes | sudo apt-get purge libreoffice* ; sudo apt-get clean ; clear
@@ -63,25 +59,7 @@ sudo -H pip3 install threadpoolctl dominate ; sudo -H pip3 install -U numpy setu
 sudo -H pip3 install llvmlite==0.31 numba==0.48
 
 sudo -H pip3 install matplotlib ipython colorgram.py scikit-build
-sudo -H pip3 install librosa opencv-python pandas ; clear
-
-echo '--Installing Visual Studio Code (Code-OSS)--' ; echo ; echo ; sleep 2
-curl -L https://github.com/toolboc/vscode/releases/download/1.32.3/code-oss_1.32.3-arm64.deb -o code-oss_1.32.3-arm64.deb
-sudo dpkg -i code-oss_1.32.3-arm64.deb ; clear
-
-echo '--Installing Jupyter--' ; echo ; echo ; sleep 2
-sudo -H pip3 install jupyter jupyterlab
-sudo jupyter labextension install @jupyter-widgets/jupyterlab-manager
-sudo jupyter labextension install @jupyterlab/statusbar ; clear
-
-cd ~/Desktop ; touch launchJupyter.sh
-echo "#!/bin/bash" | sudo tee -a launchJupyter.sh
-echo "# The following line must be executed prior to launching Jupyter" | sudo tee -a launchJupyter.sh
-echo | sudo tee -a launchJupyter.sh
-echo "export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1" | sudo tee -a launchJupyter.sh
-echo | sudo tee -a launchJupyter.sh
-echo "jupyter notebook" | sudo tee -a launchJupyter.sh
-sudo chmod +x launchJupyter.sh ; clear
+sudo -H pip3 install librosa pandas ; clear
 
 echo '--Installing DDSP--' ; echo ; echo ; sleep 2
 sudo apt-get update
@@ -99,23 +77,32 @@ sudo -H npm install -g @bazel/bazelisk
 
 sudo -H pip3 install -U ddsp colorama
 
-# echo '--Compiling DDSP for PyTorch--' ; echo ; echo ; sleep 2
-# cd ~/Desktop/raivShell/ddspShell/ddsp_pytorch-master/realtime ; mkdir build ; cd build
-# export Torch_DIR=/usr/local/lib/python3.6/dist-packages/torch/share/cmake/Torch
-# sudo cmake ../ -DCMAKE_PREFIX_PATH=/usr/local/lib/python3.6/dist-packages/torch -DCMAKE_BUILD_TYPE=Release
-# sudo make install
-
 echo '--Installing ADC Connections for Analog Control--' ; echo ; echo ; sleep 2
 sudo -H pip3 install adafruit-circuitpython-mcp3xxx Adafruit-Blinka
-sudo chmod +x initialize-spi.sh ; sudo chmod +x initialize-pa.sh
-sudo chmod +x initialize-python.sh ; clear
+cd ../ ; cd raivCtrl ; sudo chmod +x init-spi.sh ; sudo chmod +x init-pa.sh ; sudo chmod +x init-py.sh ; clear
+
+echo '--Creating OLED Status Display Service--' ; echo ; echo ; sleep 2
+git clone https://github.com/JetsonHacksNano/installPiOLED
+cd installPiOLED; ./installPiOLED.sh; ./createService.sh
+sudo scp ~/Desktop/raivBox/raivCtrl/stats.py /usr/local/lib/python3.6/dist-packages/pioled
+sudo systemctl enable pioled_stats ; sudo systemctl start pioled_stats ; clear
+
+echo '--Creating Analog Control systemd Modules--' ; echo ; echo ; sleep 2
+sudo touch /etc/systemd/user/boot-leds.service
+sudo cat ~/Desktop/raivBox/raivCtrl/boot-leds_service.txt > /etc/systemd/user/boot-leds.service
+sudo chmod +x /etc/systemd/user/boot-leds.service ; 
+systemctl --user enable boot-leds ; systemctl --user start boot-leds ; clear
+
+sudo touch /etc/systemd/system/boot-knobs.service
+sudo cat ~/Desktop/raivBox/raivCtrl/boot-knobs_service.txt > /etc/systemd/system/boot-knobs.service
+sudo chmod +x /etc/systemd/system/boot-knobs.service ; 
+sudo systemctl enable boot-knobs ; sudo systemctl start boot-knobs ; clear
 
 echo '--Final Housekeeping--' ; echo ; sleep 2
 sudo apt update ; yes | sudo apt upgrade ; sudo -H pip3 install -U jetson-stats ; yes | sudo apt-get install florence
 cd ~/Desktop ; touch florence.sh ; echo "#!/bin/bash" | sudo tee -a florence.sh
 echo "echo 'Launching Florence Virtual Keyboard'" | sudo tee -a florence.sh
-echo "florence" | sudo tee -a florence.sh
-sudo chmod +x florence.sh
+echo "florence" | sudo tee -a florence.sh; sudo chmod +x florence.sh
 yes | sudo apt autoremove ; sudo apt clean ; clear
 
 echo '--SPI Configuration and Reboot Sequence--' ; echo ; sleep 2
