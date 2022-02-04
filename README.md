@@ -14,8 +14,4 @@ raivBox is a standalone digital neural audio synthesis device based on Google Ma
 
 #### In the upcoming version:
 
-`raivShell` has the installation scripts needed for loading the core dependencies on blank installs
-
-`raivSynth` is the DDSP synthesizer module
-
-`raivCtrl` is the hardware control module
+The `raivBox` folder contains all of the important files and scripts
