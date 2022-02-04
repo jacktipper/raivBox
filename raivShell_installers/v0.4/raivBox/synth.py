@@ -1,9 +1,9 @@
 # Hyperparameters
 
 RATE = 16000  # Hz
-AUDIO_FILE = 'audio/input.wav'
-PRETRAINED_MODEL = 'saxophone'  # acid, saxophone
-AUDIO_OUT = 'audio/output.wav'
+INPUT_PATH = 'audio/input.wav'
+MODEL = 'acid'  # acid, saxophone
+OUTPUT_PATH = 'audio/output.wav'
 
 VOICING_THRESHOLD = -125  # dB
 PITCH_SHIFT = -1  # octaves up or down
@@ -26,7 +26,17 @@ import tensorflow.compat.v2 as tf
 from ddsp.core import make_iterable, hz_to_midi, copy_if_tf_function
 from ddsp.training.models import Autoencoder
 from tensorflow.python.ops.numpy_ops import np_config
+from multiprocessing import Process
 from datetime import datetime
+
+import Jetson.GPIO as GPIO
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+led0pin = 20
+GPIO.setup(led0pin, GPIO.OUT, initial=GPIO.LOW)
+
+if os.path.exists(OUTPUT_PATH): GPIO.output(led0pin, GPIO.HIGH)
 
 # Disable GPU (CUDA and TensorFlow need to be patched)
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -540,102 +550,6 @@ class QuantileTransformer:
         return self.fit(x).transform(x)
 
 
-# Audio Feature Extraction
-fs = RATE
-x, fs = librosa.load(AUDIO_FILE, sr=fs, mono=True)
-os.system('{} {}'.format(PLAY_CMD, AUDIO_FILE))
-
-
-# Compute features.
-audio_features = compute_audio_features(x)
-
-np_config.enable_numpy_behavior()
-
-audio_features['loudness_db'] = audio_features['loudness_db'].astype(
-    np.float32)
-audio_features_mod = None
-
-
-# Fixing f0_confidence
-audio_features['f0_confidence'] = np.ones(len(audio_features['f0_confidence']))
-
-voicing_threshold = VOICING_THRESHOLD  # dB
-
-for i in range(len(audio_features['f0_confidence'])):
-    if audio_features['loudness_db'][i] < voicing_threshold:
-        audio_features['f0_confidence'][i] = 0.
-
-audio_features['f0_confidence'] = audio_features['f0_confidence'].astype(
-    np.float32)
-
-
-# Load a model
-model_dir = 'models/{}'.format(PRETRAINED_MODEL)
-gin_file = os.path.join(model_dir, 'operative_config-0.gin')
-
-# Load the dataset statistics.
-DATASET_STATS = None
-dataset_stats_file = os.path.join(model_dir, 'dataset_statistics.pkl')
-try:
-    if tf.io.gfile.exists(dataset_stats_file):
-        with tf.io.gfile.GFile(dataset_stats_file, 'rb') as f:
-            DATASET_STATS = pickle.load(f)
-except Exception as err:
-    print('Loading dataset statistics from pickle failed: {}.'.format(err))
-
-# Parse gin config,
-with gin.unlock_config():
-    gin.parse_config_file(gin_file, skip_unknown=True)
-
-# Ensure dimensions and sampling rates are equal
-time_steps_train = gin.query_parameter('F0LoudnessPreprocessor.time_steps')
-n_samples_train = gin.query_parameter('Harmonic.n_samples')
-hop_size = int(n_samples_train / time_steps_train)
-
-time_steps = int(x.shape[0] / hop_size)
-n_samples = time_steps * hop_size
-
-gin_params = [
-    'Harmonic.n_samples = {}'.format(n_samples),
-    'FilteredNoise.n_samples = {}'.format(n_samples),
-    'F0LoudnessPreprocessor.time_steps = {}'.format(time_steps),
-    # Avoids cumsum accumulation errors.
-    'oscillator_bank.use_angular_cumsum = True',
-]
-
-with gin.unlock_config():
-    gin.parse_config(gin_params)
-
-
-# Trim all input vectors to correct lengths
-for key in ['f0_hz', 'f0_confidence', 'loudness_db']:
-    audio_features[key] = audio_features[key][:time_steps]
-audio_features['audio'] = audio_features['audio'][:n_samples]
-
-
-# Modify conditioning
-
-# Note Detection (leave this at 1.0 for most cases)
-threshold = 1  # min: 0.0, max:2.0, step:0.01
-
-# Trim
-TRIM = -15
-
-# Automatic
-ADJUST = True
-
-# Quiet parts without notes detected (dB)
-quiet = 0  # @param {type:"slider", min: 0, max:60, step:1}
-
-# Shift the pitch (octaves)
-pitch_shift = PITCH_SHIFT  # @param {type:"slider", min:-2, max:2, step:1}
-
-# @markdown Adjust the overall loudness (dB)
-loudness_shift = LOUDNESS  # @param {type:"slider", min:-20, max:20, step:1}
-
-audio_features_mod = {k: np.copy(v) for k, v in audio_features.items()}
-
-
 # Helper functions
 def shift_ld(audio_features, ld_shift=0.0):
     """Shift loudness by a number of ocatves."""
@@ -663,61 +577,201 @@ def smooth(x, filter_size=3):
     return y.numpy()
 
 
+def blinker():
+    try:
+        while True:
+            GPIO.output(led0pin, GPIO.HIGH)
+            sleep(0.08)
+            GPIO.output(led0pin, GPIO.LOW)
+            sleep(0.12)
+    finally:
+        GPIO.output(led0pin, GPIO.LOW)
+    return
 
-# Adjustments
-mask_on = None
-
-if ADJUST and DATASET_STATS is not None:
-    # Detect sections that are "on".
-    mask_on, note_on_value = detect_notes(audio_features['loudness_db'],
-                                          audio_features['f0_confidence'],
-                                          threshold)
-
-    if np.any(mask_on):
-        # Shift the pitch register.
-        target_mean_pitch = DATASET_STATS['mean_pitch']
-        pitch = hz_to_midi(audio_features['f0_hz'])
-        mean_pitch = np.mean(pitch[mask_on])
-        p_diff = target_mean_pitch - mean_pitch
-        p_diff_octave = p_diff / 12.0
-        round_fn = np.floor if p_diff_octave > 1.5 else np.ceil
-        p_diff_octave = round_fn(p_diff_octave)
-        audio_features_mod = shift_f0(audio_features_mod, p_diff_octave)
-
-        # Quantile shift the note_on parts.
-        _, loudness_norm = fit_quantile_transform(
-            audio_features['loudness_db'],
-            mask_on,
-            inv_quantile=DATASET_STATS['quantile_transform'])
-
-        # Turn down the note_off parts.
-        mask_off = np.logical_not(mask_on)
-        loudness_norm[mask_off] -= quiet * \
-            (1.0 - note_on_value[mask_off][:, np.newaxis])
-        loudness_norm = np.reshape(
-            loudness_norm, audio_features['loudness_db'].shape)
-
-        audio_features_mod['loudness_db'] = loudness_norm
-
-else:
-    print('\nSkipping auto-adujst (no dataset statistics found).')
-
-# Manual Shifts.
-audio_features_mod = shift_ld(audio_features_mod, loudness_shift)
-audio_features_mod = shift_f0(audio_features_mod, pitch_shift)
-af = audio_features if audio_features_mod is None else audio_features_mod
+blink = None
 
 
-# Load the model
-model = Autoencoder()
-model.load_weights('models/{}/just_vars/'.format(PRETRAINED_MODEL))
+try:
+    while True:
+        if os.path.exists(INPUT_PATH):
+
+            blink = Process(target=blinker())
+            blink.start()
+
+            # Audio Feature Extraction
+            fs = RATE
+            x, fs = librosa.load(INPUT_PATH, sr=fs, mono=True)
 
 
-# Run inference
-outputs = model(af, training=False)
+            # Compute features.
+            audio_features = compute_audio_features(x)
 
-audio_gen = model.get_audio_from_outputs(outputs)
-audio_gen = audio_gen.numpy()[0]
-audio_gen = audio_gen/np.max(audio_gen)
+            np_config.enable_numpy_behavior()
 
-sf.write(AUDIO_OUT, audio_gen, fs)
+            audio_features['loudness_db'] = audio_features['loudness_db'].astype(
+                np.float32)
+            audio_features_mod = None
+
+
+            # Fixing f0_confidence
+            audio_features['f0_confidence'] = np.ones(len(audio_features['f0_confidence']))
+
+            voicing_threshold = VOICING_THRESHOLD  # dB
+
+            for i in range(len(audio_features['f0_confidence'])):
+                if audio_features['loudness_db'][i] < voicing_threshold:
+                    audio_features['f0_confidence'][i] = 0.
+
+            audio_features['f0_confidence'] = audio_features['f0_confidence'].astype(
+                np.float32)
+
+
+            # Load a model
+            model_dir = 'models/{}'.format(MODEL)
+            gin_file = os.path.join(model_dir, 'operative_config-0.gin')
+
+            # Load the dataset statistics.
+            DATASET_STATS = None
+            dataset_stats_file = os.path.join(model_dir, 'dataset_statistics.pkl')
+            try:
+                if tf.io.gfile.exists(dataset_stats_file):
+                    with tf.io.gfile.GFile(dataset_stats_file, 'rb') as f:
+                        DATASET_STATS = pickle.load(f)
+            except Exception as err:
+                print('Loading dataset statistics from pickle failed: {}.'.format(err))
+
+            # Parse gin config,
+            with gin.unlock_config():
+                gin.parse_config_file(gin_file, skip_unknown=True)
+
+            # Ensure dimensions and sampling rates are equal
+            time_steps_train = gin.query_parameter('F0LoudnessPreprocessor.time_steps')
+            n_samples_train = gin.query_parameter('Harmonic.n_samples')
+            hop_size = int(n_samples_train / time_steps_train)
+
+            time_steps = int(x.shape[0] / hop_size)
+            n_samples = time_steps * hop_size
+
+            gin_params = [
+                'Harmonic.n_samples = {}'.format(n_samples),
+                'FilteredNoise.n_samples = {}'.format(n_samples),
+                'F0LoudnessPreprocessor.time_steps = {}'.format(time_steps),
+                # Avoids cumsum accumulation errors.
+                'oscillator_bank.use_angular_cumsum = True',
+            ]
+
+            with gin.unlock_config():
+                gin.parse_config(gin_params)
+
+
+            # Trim all input vectors to correct lengths
+            for key in ['f0_hz', 'f0_confidence', 'loudness_db']:
+                audio_features[key] = audio_features[key][:time_steps]
+            audio_features['audio'] = audio_features['audio'][:n_samples]
+
+
+            # Modify conditioning
+
+            # Note Detection (leave this at 1.0 for most cases)
+            threshold = 1  # min: 0.0, max:2.0, step:0.01
+
+            # Trim
+            TRIM = -15
+
+            # Automatic
+            ADJUST = True
+
+            # Quiet parts without notes detected (dB)
+            quiet = 0  # @param {type:"slider", min: 0, max:60, step:1}
+
+            # Shift the pitch (octaves)
+            pitch_shift = PITCH_SHIFT  # @param {type:"slider", min:-2, max:2, step:1}
+
+            # @markdown Adjust the overall loudness (dB)
+            loudness_shift = LOUDNESS  # @param {type:"slider", min:-20, max:20, step:1}
+
+            audio_features_mod = {k: np.copy(v) for k, v in audio_features.items()}
+
+            # Adjustments
+            mask_on = None
+
+            if ADJUST and DATASET_STATS is not None:
+                # Detect sections that are "on".
+                mask_on, note_on_value = detect_notes(audio_features['loudness_db'],
+                                                    audio_features['f0_confidence'],
+                                                    threshold)
+
+                if np.any(mask_on):
+                    # Shift the pitch register.
+                    target_mean_pitch = DATASET_STATS['mean_pitch']
+                    pitch = hz_to_midi(audio_features['f0_hz'])
+                    mean_pitch = np.mean(pitch[mask_on])
+                    p_diff = target_mean_pitch - mean_pitch
+                    p_diff_octave = p_diff / 12.0
+                    round_fn = np.floor if p_diff_octave > 1.5 else np.ceil
+                    p_diff_octave = round_fn(p_diff_octave)
+                    audio_features_mod = shift_f0(audio_features_mod, p_diff_octave)
+
+                    # Quantile shift the note_on parts.
+                    _, loudness_norm = fit_quantile_transform(
+                        audio_features['loudness_db'],
+                        mask_on,
+                        inv_quantile=DATASET_STATS['quantile_transform'])
+
+                    # Turn down the note_off parts.
+                    mask_off = np.logical_not(mask_on)
+                    loudness_norm[mask_off] -= quiet * \
+                        (1.0 - note_on_value[mask_off][:, np.newaxis])
+                    loudness_norm = np.reshape(
+                        loudness_norm, audio_features['loudness_db'].shape)
+
+                    audio_features_mod['loudness_db'] = loudness_norm
+
+            else:
+                print('\nSkipping auto-adujst (no dataset statistics found).')
+
+            # Manual Shifts.
+            audio_features_mod = shift_ld(audio_features_mod, loudness_shift)
+            audio_features_mod = shift_f0(audio_features_mod, pitch_shift)
+            af = audio_features if audio_features_mod is None else audio_features_mod
+
+
+            # Load the model
+            model = Autoencoder()
+            model.load_weights('models/{}/just_vars/'.format(MODEL))
+
+
+            # Run inference
+            outputs = model(af, training=False)
+
+            audio_gen = model.get_audio_from_outputs(outputs)
+            audio_gen = audio_gen.numpy()[0]
+            audio_gen = audio_gen/np.max(audio_gen)
+
+            dest = str(datetime.now())[0:19]
+            if os.path.exists(OUTPUT_PATH):
+                os.rename('audio/output.wav', str('audio/archive/out_' + dest + '.wav'))
+
+            sf.write(OUTPUT_PATH, audio_gen, fs)
+            blink.join()
+            GPIO.output(led0pin, GPIO.HIGH)
+
+            os.rename('audio/input.wav', str('audio/archive/in_' + dest + '.wav'))
+
+        # set the status check interval for the while loop (responsivity)
+        time.sleep(0.02)
+
+
+
+finally:
+    dest = str(datetime.now())[0:19]
+    if os.path.exists(INPUT_PATH): 
+        os.rename(INPUT_PATH, str('audio/archive/in_' + dest + '.wav'))
+    if os.path.exists(OUTPUT_PATH):
+        os.rename(OUTPUT_PATH, str('audio/archive/out_' + dest + '.wav'))
+    os.remove(INPUT_PATH)
+    os.remove(OUTPUT_PATH)
+    GPIO.output(led0pin, GPIO.LOW)
+
+
+print('\n\n    ALL DONE.\n\n')
