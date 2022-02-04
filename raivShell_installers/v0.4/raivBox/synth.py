@@ -597,10 +597,11 @@ print(595)
 blink.terminate()
 blink = None
 GPIO.output(led0pin, GPIO.HIGH)
+ready = 'audio/read.y'
 
 try:
     while True:
-        if os.path.exists(INPUT_PATH):
+        if os.path.exists(ready):
 
             blink = Process(target=blinker)
             blink.start()
@@ -757,7 +758,7 @@ try:
 
             dest = str(datetime.now())[0:19]
             if os.path.exists(OUTPUT_PATH):
-                os.rename('audio/output.wav', str('audio/archive/out_' + dest + '.wav'))
+                os.rename(OUTPUT_PATH, str('audio/archive/out_' + dest + '.wav'))
 
             sf.write(OUTPUT_PATH, audio_gen, fs)
             print('\n\n    Output Successfully Synthesized\n\n')
@@ -765,7 +766,8 @@ try:
             blink = None
             GPIO.output(led0pin, GPIO.HIGH)
 
-            os.rename('audio/input.wav', str('audio/archive/in_' + dest + '.wav'))
+            os.rename(INPUT_PATH, str('audio/archive/in_' + dest + '.wav'))
+            os.remove(ready)
 
         # set the status check interval for the while loop (responsivity)
         time.sleep(0.02)
@@ -773,6 +775,8 @@ try:
     print(773)
 
 finally:
+    if os.path.exists(ready):
+        os.remove(ready)
     dest = str(datetime.now())[0:19]
     if os.path.exists(INPUT_PATH): 
         os.rename(INPUT_PATH, str('audio/archive/f_in_' + dest + '.wav'))
