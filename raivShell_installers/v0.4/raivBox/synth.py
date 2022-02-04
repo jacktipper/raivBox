@@ -2,82 +2,39 @@
 
 RATE = 16000  # Hz
 AUDIO_FILE = 'audio/input.wav'
-PRETRAINED_MODEL = 'acid'  # acid, saxophone
-PLAY_CMD = 'aplay'  # 'aplay' for Linux, 'afplay' for macOS
+PRETRAINED_MODEL = 'saxophone'  # acid, saxophone
 AUDIO_OUT = 'audio/output.wav'
 
 VOICING_THRESHOLD = -125  # dB
 PITCH_SHIFT = -1  # octaves up or down
 LOUDNESS = 5  # loudness shift (normalized anyway)
-USE_TF = False  # tensorflow or numpy?
-TIMING = True  # time each section?
-TRACE_MALLOC = False  # report system memory usage?
-
-print('Hyperparameters loaded')
 
 
 # Libraries
-print('Importing Libraries\n')
+import os
+os.system('./init-py.sh')
 
 import warnings
-if TIMING: import time
-if TRACE_MALLOC: import tracemalloc
-
 warnings.filterwarnings("ignore")
-if TIMING: start_time = time.time()
-if TRACE_MALLOC: tracemalloc.start()
 
-if TRACE_MALLOC:
-    def tracemem(string, seconds=0.01):
-        current, peak = tracemalloc.get_traced_memory()
-        print(
-            f"\n {string} - Current memory usage is {current / 10**6}MB; Peak was {peak / 10**6}MB\n")
-        # time.sleep(seconds)
-        return
-else:
-    def tracemem(string, seconds):
-        return
-
-tracemem('start')
-
-import gin; tracemem('gin')
-import librosa; tracemem('librosa')
-import os; os.system('./init-py.sh'); tracemem('os')
-import pickle; tracemem('pickle')
-import numpy as np; tracemem('np')
-import soundfile as sf; tracemem('sf')
-import tensorflow.compat.v2 as tf; tracemem('tf', 5.)
-from ddsp.core import make_iterable, hz_to_midi, copy_if_tf_function; tracemem('ddsp.core')
-from ddsp.training.models import Autoencoder, Model; tracemem('Autoencoder', 5.)
+import gin
+import librosa
+import pickle
+import numpy as np
+import soundfile as sf
+import tensorflow.compat.v2 as tf
+from ddsp.core import make_iterable, hz_to_midi, copy_if_tf_function
+from ddsp.training.models import Autoencoder
 from tensorflow.python.ops.numpy_ops import np_config
 from datetime import datetime
 
-
-
-# Commands for RAM usage -- commented commands may fix GPU memory leak issue 
-# once CUDA and Tensorflow are patched
-
-# os.environ['TF_GPU_ALLOCATOR'] = 'cuda_malloc'
-# os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
+# Disable GPU (CUDA and TensorFlow need to be patched)
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-print('tensorflow version:', tf.__version__)
-print('\nTF_GPU_ALLOCATOR:', os.getenv('TF_GPU_ALLOCATOR'))
-print('\nTF_FORCE_GPU_ALLOW_GROWTH:', os.getenv('TF_FORCE_GPU_ALLOW_GROWTH'), '\n')
-
-if TIMING: print('Importing libraries took %.3f seconds' % (time.time() - start_time))
-
-
-# Devices
-devices = tf.config.list_physical_devices()
-print('TensorFlow running on:', devices, '\n')
-# tf.debugging.set_log_device_placement(True)
 
 
 # DDSP Helper Functions (extracted from official modules)
-if TIMING: start_time = time.time()
 
 # from metrics.py
-
 def squeeze(input_vector):
     """Ensure vector only has one axis of dimensionality."""
     if input_vector.ndim > 1:
@@ -110,11 +67,10 @@ def tf_float32(x):
     else:
         return tf.convert_to_tensor(x, tf.float32)
 
+
 # from spectral_ops.py
-
-
 LD_RANGE = 120.0  # dB
-
+USE_TF = False  # tensorflow or numpy?
 
 def stft(audio, frame_size=2048, overlap=0.75, pad_end=True):
     """Differentiable stft in tensorflow, computed in batch."""
@@ -584,25 +540,14 @@ class QuantileTransformer:
         return self.fit(x).transform(x)
 
 
-if TIMING: print('Loading helper functions took %.3f seconds' %
-      (time.time() - start_time))
-
-tracemem('helpers')
-
 # Audio Feature Extraction
 fs = RATE
-
 x, fs = librosa.load(AUDIO_FILE, sr=fs, mono=True)
 os.system('{} {}'.format(PLAY_CMD, AUDIO_FILE))
 
-tracemem('audio loaded', 5.)
-
-print('\nExtracting audio features...')
 
 # Compute features.
-if TIMING: start_time = time.time()
 audio_features = compute_audio_features(x)
-print('Successfully computed audio features')
 
 np_config.enable_numpy_behavior()
 
@@ -610,12 +555,8 @@ audio_features['loudness_db'] = audio_features['loudness_db'].astype(
     np.float32)
 audio_features_mod = None
 
-if TIMING: print('Audio features took %.3f seconds' % (time.time() - start_time))
-
-tracemem('features', 5.)
 
 # Fixing f0_confidence
-if TIMING: start_time = time.time()
 audio_features['f0_confidence'] = np.ones(len(audio_features['f0_confidence']))
 
 voicing_threshold = VOICING_THRESHOLD  # dB
@@ -627,19 +568,14 @@ for i in range(len(audio_features['f0_confidence'])):
 audio_features['f0_confidence'] = audio_features['f0_confidence'].astype(
     np.float32)
 
-if TIMING: print('Fixing f0_confidence took %.3f seconds' % (time.time() - start_time))
-
 
 # Load a model
-if TIMING: start_time = time.time()
-
 model_dir = 'models/{}'.format(PRETRAINED_MODEL)
 gin_file = os.path.join(model_dir, 'operative_config-0.gin')
 
 # Load the dataset statistics.
 DATASET_STATS = None
 dataset_stats_file = os.path.join(model_dir, 'dataset_statistics.pkl')
-# print(f'Loading dataset statistics from {dataset_stats_file}')
 try:
     if tf.io.gfile.exists(dataset_stats_file):
         with tf.io.gfile.GFile(dataset_stats_file, 'rb') as f:
@@ -667,9 +603,6 @@ gin_params = [
     'oscillator_bank.use_angular_cumsum = True',
 ]
 
-with open("gp.pkl", "wb") as f:
-    pickle.dump(gin_params, f)
-
 with gin.unlock_config():
     gin.parse_config(gin_params)
 
@@ -679,14 +612,10 @@ for key in ['f0_hz', 'f0_confidence', 'loudness_db']:
     audio_features[key] = audio_features[key][:time_steps]
 audio_features['audio'] = audio_features['audio'][:n_samples]
 
-if TIMING: print('Loading dataset statistics took %.3f seconds' %
-      (time.time() - start_time))
-
 
 # Modify conditioning
 
-# Note Detection
-# leave this at 1.0 for most cases
+# Note Detection (leave this at 1.0 for most cases)
 threshold = 1  # min: 0.0, max:2.0, step:0.01
 
 # Trim
@@ -736,8 +665,6 @@ def smooth(x, filter_size=3):
 
 
 # Adjustments
-if TIMING: start_time = time.time()
-
 mask_on = None
 
 if ADJUST and DATASET_STATS is not None:
@@ -773,47 +700,24 @@ if ADJUST and DATASET_STATS is not None:
         audio_features_mod['loudness_db'] = loudness_norm
 
 else:
-    print('\nSkipping auto-adujst (box not checked or no dataset statistics found).')
+    print('\nSkipping auto-adujst (no dataset statistics found).')
 
 # Manual Shifts.
 audio_features_mod = shift_ld(audio_features_mod, loudness_shift)
 audio_features_mod = shift_f0(audio_features_mod, pitch_shift)
-
-if TIMING: print('Adjusting took %.3f seconds' % (time.time() - start_time))
-
 af = audio_features if audio_features_mod is None else audio_features_mod
 
+
 # Load the model
-if TIMING: start_time = time.time()
-
 model = Autoencoder()
-
 model.load_weights('models/{}/just_vars/'.format(PRETRAINED_MODEL))
 
-if TIMING: print('Loading model took %.3f seconds\n' % (time.time() - start_time))
 
-
-tracemem('model load', 5.)
-
-
-# Run a batch of predictions.
-if TIMING: start_time = time.time()
-
+# Run inference
 outputs = model(af, training=False)
-
-tracemem('inference', 15.)
 
 audio_gen = model.get_audio_from_outputs(outputs)
 audio_gen = audio_gen.numpy()[0]
 audio_gen = audio_gen/np.max(audio_gen)
 
-tracemem('audio gen', 5.)
-
-if TIMING: print('Prediction took %.3f seconds' % (time.time() - start_time))
-
 sf.write(AUDIO_OUT, audio_gen, fs)
-print('Resynthesis Complete')
-
-# Trace memory usage
-tracemem('total')
-if TRACE_MALLOC: tracemalloc.stop()

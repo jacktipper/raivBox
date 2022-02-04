@@ -5,8 +5,8 @@ import digitalio
 import busio
 from time import sleep
 import os
-os.system('./initialize-python.sh')
-os.system('./initialize-pa.sh')
+os.system('./init-py.sh')
+os.system('./init-pa.sh')
 
 # create the spi bus
 spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)

@@ -50,12 +50,10 @@ GPIO.setup(button2pin, GPIO.IN)
 directory = os.getcwd()
 rec_cmd = str(
     "exec arecord -d 20 -t wav -c 1 -f FLOAT_LE -r 16000 audio/input.wav")
-synth_cmd = str(
-    "exec ./run-synth.sh")
-play1cmd = str(
+play_cmd = str(
     "exec aplay audio/output.wav")
-play2cmd = str(
-    "exec aplay audio/input.wav")
+
+os.system('./init-synth.sh') # initialize the synth loop
 
 try:
     while True:
@@ -73,14 +71,8 @@ try:
             # synthesize output audio once recording is complete
             elif recording == 1 and curr1value == 1:
                 rec.send_signal(signal.SIGINT)
-                print('Recording Ended')
                 recording = 0
-                try:
-                    synth = subprocess.Popen(
-                        [synth_cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
-                except:
-                    pass
-                print('Timbre Transfer Engaged')
+                print('Recording Ended')
             prev1value = curr1value
         if curr2value != prev2value:
             GPIO.output(led2pin, not curr2value)
@@ -95,15 +87,12 @@ try:
                         [play2cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
             if playing == 1 and curr2value == 1:
                 play.send_signal(signal.SIGINT)
-                print('Audio Stopped')
                 playing = 0
+                print('Audio Stopped')
             prev2value = curr2value
         # set the status check interval for the while loop (responsivity)
         sleep(0.02)
 finally:
-    # purge the temporary files from the Audio folder
-    os.system("rm audio/recorded/*.*")
-    os.system("rm audio/rendered/*.*")
     # if the program is prematurely terminated, turn on just the two top LEDs to indicate
     GPIO.output(led0pin, GPIO.LOW)
     GPIO.output(led1pin, GPIO.HIGH)

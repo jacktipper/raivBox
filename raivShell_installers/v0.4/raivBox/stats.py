@@ -117,16 +117,16 @@ while True:
 
     # Alternate solution: Draw the GPU usage as text
     # draw.text((x, top+8),     "GPU:  " +"{:3.1f}".format(GPU)+" %", font=font, fill=255)
-    # We draw the GPU usage as a bar graph
-    string_width, string_height = font.getsize("GPU:  ")
+    # We draw the CPU usage as a bar graph
+    string_width, string_height = font.getsize("CPU:  ")
     # Figure out the width of the bar
     full_bar_width = width-(x+string_width)-1
-    gpu_usage = get_gpu_usage()
+    cpu_usage = get_cpu_usage()
     # Avoid divide by zero ...
-    if gpu_usage == 0.0:
-        gpu_usage = 0.001
-    draw_bar_width = int(full_bar_width*(gpu_usage/100))
-    draw.text((x, top+8),     "GPU:  ", font=font, fill=255)
+    if cpu_usage == 0.0:
+        cpu_usage = 0.001
+    draw_bar_width = int(full_bar_width*(cpu_usage/100))
+    draw.text((x, top+8),     "CPU:  ", font=font, fill=255)
     draw.rectangle((x+string_width, top+12, x+string_width +
                     draw_bar_width, top+14), outline=1, fill=1)
 

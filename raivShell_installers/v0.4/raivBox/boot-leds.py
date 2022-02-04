@@ -2,7 +2,7 @@ from time import sleep
 import Jetson.GPIO as GPIO
 import os
 import subprocess
-os.system('./initialize-python.sh')
+os.system('./init-py.sh')
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -65,6 +65,6 @@ while booting:
         GPIO.output(led2pin, GPIO.LOW)
         booting = False
         GPIO.cleanup()
-        GO = subprocess.Popen(['python3 hw-ctrl.py'],
+        GO = subprocess.Popen(['python3 buttons.py'],
                               cwd=directory, shell=True)
     sleep(0.02)
