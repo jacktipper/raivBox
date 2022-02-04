@@ -100,7 +100,7 @@ while powered_on:
         # convert 16bit adc value into 0-100 volume level
         set_in_vol = remap_range(trim_input, 0, 65535, 0, 100)
 
-        # set OS volume
+        # set OS input volume
         print('Input Volume = {volume}%' .format(volume=set_in_vol))
         set_in_vol_cmd = 'pactl set-source-volume 1 {volume}%' \
             .format(volume=set_in_vol)
@@ -115,7 +115,7 @@ while powered_on:
         # convert 16bit adc value into 0-100 volume level
         set_out_vol = remap_range(trim_output, 0, 65535, 0, 100)
 
-        # set OS volume
+        # set OS output volume
         print('Output Volume = {volume}%' .format(volume=set_out_vol))
         set_out_vol_cmd = 'pactl set-sink-volume 0 {volume}%' \
             .format(volume=set_out_vol)

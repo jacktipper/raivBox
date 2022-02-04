@@ -3,8 +3,8 @@ import Jetson.GPIO as GPIO
 import signal
 import subprocess
 import os
-os.system('./init-py.sh')
-os.system('./init-pa.sh')
+os.system('./init-py.sh') # initialize for python
+os.system('./init-pa.sh') # initialize pulseaudio
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
@@ -39,7 +39,7 @@ prev2value = None
 recording = 0
 playing = 0
 rec = None
-dsp = None
+synth = None
 play = None
 
 GPIO.setup(led1pin, GPIO.OUT, initial=GPIO.LOW)
@@ -49,11 +49,11 @@ GPIO.setup(button2pin, GPIO.IN)
 
 directory = os.getcwd()
 rec_cmd = str(
-    "exec arecord -d 20 -t wav -c 1 -f FLOAT_LE -r 48000 Audio/input.wav")
-dsp_cmd = str(
-    "exec python3 dsp.py")
+    "exec arecord -d 20 -t wav -c 1 -f FLOAT_LE -r 16000 audio/recorded/input.wav")
+synth_cmd = str(
+    "exec ./run-synth.sh")
 play_cmd = str(
-    "exec aplay Audio/output.wav")
+    "exec aplay audio/rendered/output.wav")
 
 try:
     while True:
@@ -68,13 +68,14 @@ try:
                 rec = subprocess.Popen(
                     [rec_cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
                 sleep(0.15)
+            # synthesize output audio once recording is complete
             elif recording == 1 and curr1value == 1:
                 rec.send_signal(signal.SIGINT)
                 print('Recording Ended')
                 recording = 0
-                dsp = subprocess.Popen(
-                    [dsp_cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
-                print('DSP Engaged')
+                synth = subprocess.Popen(
+                    [synth_cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
+                print('Timbre Transfer Engaged')
             prev1value = curr1value
         if curr2value != prev2value:
             GPIO.output(led2pin, not curr2value)
@@ -92,7 +93,8 @@ try:
         sleep(0.02)
 finally:
     # purge the temporary files from the Audio folder
-    os.system("rm Audio/*.*")
+    os.system("rm audio/recorded/*.*")
+    os.system("rm audio/rendered/*.*")
     # if the program is prematurely terminated, turn on just the two top LEDs to indicate
     GPIO.output(led0pin, GPIO.LOW)
     GPIO.output(led1pin, GPIO.HIGH)

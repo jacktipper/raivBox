@@ -76,6 +76,7 @@ echo '--Creating OLED Status Display Service--' ; echo ; echo ; sleep 2
 git clone https://github.com/JetsonHacksNano/installPiOLED
 cd installPiOLED; ./installPiOLED.sh; ./createService.sh
 sudo scp ~/Desktop/raivBox/raivCtrl/stats.py /usr/local/lib/python3.6/dist-packages/pioled
+cd ~ ; sudo rm -rf installPiOLED ; sudo rm ~/Desktop/raivBox/raivCtrl/stats.py
 sudo systemctl enable pioled_stats ; sudo systemctl start pioled_stats ; clear
 
 echo '--Creating Analog Control systemd Modules--' ; echo ; echo ; sleep 2

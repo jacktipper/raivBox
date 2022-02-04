@@ -1,10 +1,10 @@
 # Hyperparameters
 
 RATE = 16000  # Hz
-AUDIO_FILE = 'audio/003.wav'
+AUDIO_FILE = 'audio/recorded/input.wav'
 PRETRAINED_MODEL = 'acid'  # acid, saxophone
 PLAY_CMD = 'aplay'  # 'aplay' for Linux, 'afplay' for macOS
-AUDIO_OUT = 'audio/output.wav'
+AUDIO_OUT = 'audio/rendered/output.wav'
 
 VOICING_THRESHOLD = -125  # dB
 PITCH_SHIFT = -1  # octaves up or down
