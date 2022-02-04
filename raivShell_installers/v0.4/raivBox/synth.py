@@ -588,14 +588,14 @@ def blinker():
         GPIO.output(led0pin, GPIO.LOW)
     return
 
-blink = None
 
 
 try:
     while True:
         if os.path.exists(INPUT_PATH):
 
-            blink = Process(target=blinker())
+            blink = None
+            blink = Process(target=blinker)
             blink.start()
 
             # Audio Feature Extraction
@@ -753,10 +753,12 @@ try:
                 os.rename('audio/output.wav', str('audio/archive/out_' + dest + '.wav'))
 
             sf.write(OUTPUT_PATH, audio_gen, fs)
-            blink.join()
+            blink.terminate()
+            blink = None
             GPIO.output(led0pin, GPIO.HIGH)
 
             os.rename('audio/input.wav', str('audio/archive/in_' + dest + '.wav'))
+
 
         # set the status check interval for the while loop (responsivity)
         time.sleep(0.02)
@@ -772,6 +774,3 @@ finally:
     os.remove(INPUT_PATH)
     os.remove(OUTPUT_PATH)
     GPIO.output(led0pin, GPIO.LOW)
-
-
-print('\n\n    ALL DONE.\n\n')

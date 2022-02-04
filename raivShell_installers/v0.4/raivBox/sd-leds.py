@@ -2,7 +2,7 @@ from time import sleep
 import Jetson.GPIO as GPIO
 import os
 import subprocess
-os.system('./initialize-python.sh')
+os.system('./init-py.sh')
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
