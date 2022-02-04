@@ -54,18 +54,24 @@ GPIO.output(led1pin, GPIO.HIGH)
 GPIO.output(led2pin, GPIO.HIGH)
 
 directory = os.getcwd()
-GO = None
+GO = None ; gone = False
 booting = True
 
-while booting:
-    b1 = GPIO.input(button1pin)
-    b2 = GPIO.input(button2pin)
-    if b1 == 0 and b2 == 0:
-        GPIO.output(led0pin, GPIO.LOW)
-        GPIO.output(led1pin, GPIO.LOW)
-        GPIO.output(led2pin, GPIO.LOW)
-        booting = False
-        GPIO.cleanup()
+try:
+    while booting:
+        b1 = GPIO.input(button1pin)
+        b2 = GPIO.input(button2pin)
+        if b1 == 0 and b2 == 0:
+            GPIO.output(led0pin, GPIO.LOW)
+            GPIO.output(led1pin, GPIO.LOW)
+            GPIO.output(led2pin, GPIO.LOW)
+            booting = False
+            GPIO.cleanup()
+            GO = subprocess.Popen(['python3 buttons.py'],
+                                  cwd=directory, shell=True)
+            gone = True
+        sleep(0.02)
+finally:
+    if not gone:
         GO = subprocess.Popen(['python3 buttons.py'],
                               cwd=directory, shell=True)
-    sleep(0.02)
