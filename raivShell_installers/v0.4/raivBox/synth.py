@@ -18,6 +18,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import gin
+import time
 import librosa
 import pickle
 import numpy as np
@@ -581,9 +582,9 @@ def blinker():
     try:
         while True:
             GPIO.output(led0pin, GPIO.HIGH)
-            sleep(0.08)
+            time.sleep(0.08)
             GPIO.output(led0pin, GPIO.LOW)
-            sleep(0.12)
+            time.sleep(0.12)
     finally:
         GPIO.output(led0pin, GPIO.LOW)
     return
@@ -768,9 +769,7 @@ try:
 finally:
     dest = str(datetime.now())[0:19]
     if os.path.exists(INPUT_PATH): 
-        os.rename(INPUT_PATH, str('audio/archive/in_' + dest + '.wav'))
+        os.rename(INPUT_PATH, str('audio/archive/f_in_' + dest + '.wav'))
     if os.path.exists(OUTPUT_PATH):
-        os.rename(OUTPUT_PATH, str('audio/archive/out_' + dest + '.wav'))
-    os.remove(INPUT_PATH)
-    os.remove(OUTPUT_PATH)
+        os.rename(OUTPUT_PATH, str('audio/archive/f_out_' + dest + '.wav'))
     GPIO.output(led0pin, GPIO.LOW)

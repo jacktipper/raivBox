@@ -50,10 +50,12 @@ GPIO.setup(button2pin, GPIO.IN)
 directory = os.getcwd()
 rec_cmd = str(
     "exec arecord -d 20 -t wav -c 1 -f FLOAT_LE -r 16000 audio/input.wav")
-play_cmd = str(
-    "exec aplay audio/output.wav")
 
-os.system('./init-synth.sh') # initialize the synth loop
+if os.path.exists('synth.sh'):
+    play_cmd = str("exec aplay audio/output.wav")
+    os.system('./init-synth.sh') # initialize the synth loop
+else:
+    play_cmd = str("exec aplay audio/input.wav")
 
 try:
     while True:
