@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# RAIVSHELL for NVIDIA Jetson Nano 2GB - Deep Learning for Music - Installation Sequence v0.2
-#     assembled by Jack Tipper - tipper@nyu.edu - (c) 2021 RAIV - MIT License
+# RAIVSHELL for NVIDIA Jetson Nano 2GB - Deep Learning for Music - Installation Sequence v0.3
+#     assembled by Jack Tipper - tipper@nyu.edu - (c) 2022 RAIV - MIT License
 
 # First, put the enclosing folder on the Desktop, and then run the following line in terminal (without the #):
 # sudo chmod +x ~/Desktop/raivShell/raivShell.sh ; sudo ~/Desktop/raivShell/raivShell.sh
