@@ -137,6 +137,16 @@ while powered_on:
             .format(level=set_level)
         os.system(set_lvl_cmd)
 
+        # set the neural synthesizer model
+        if set_level <= int(255/2):
+            model = 'saxophone'
+        else:
+            model = 'acid'
+        if model != prev_model:
+            os.system("echo '{}' | tee 'models/model.txt'".format(model))
+            os.system('touch models/change.d')
+        prev_model = model
+
         # save the pot reading for the next loop
         top_last_read = trim_top
 

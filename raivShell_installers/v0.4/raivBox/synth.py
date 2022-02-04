@@ -2,7 +2,6 @@
 
 RATE = 16000  # Hz
 INPUT_PATH = 'audio/input.wav'
-MODEL = 'acid'  # acid, saxophone
 OUTPUT_PATH = 'audio/output.wav'
 
 VOICING_THRESHOLD = -125  # dB
@@ -51,12 +50,10 @@ from ddsp.training.models import Autoencoder
 from tensorflow.python.ops.numpy_ops import np_config
 from datetime import datetime
 
-if os.path.exists(OUTPUT_PATH): GPIO.output(led0pin, GPIO.HIGH)
 
 # Disable GPU (CUDA and TensorFlow need to be patched)
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-print(59)
 
 # DDSP Helper Functions (extracted from official modules)
 
@@ -592,12 +589,13 @@ def smooth(x, filter_size=3):
     y = y[:, :, 0] if is_2d else y[0, :, 0]
     return y.numpy()
 
-print(595)
+MODEL = str(np.genfromtxt('model.txt', str))
 
 blink.terminate()
 blink = None
 GPIO.output(led0pin, GPIO.HIGH)
 ready = 'audio/read.y'
+model_changed = 'models/change.d'
 
 try:
     while True:
@@ -769,18 +767,21 @@ try:
             os.rename(INPUT_PATH, str('audio/archive/in_' + dest + '.wav'))
             os.remove(ready)
 
+            if os.path.exists(model_changed): 
+                MODEL = str(np.genfromtxt('model.txt', str))
+                os.remove(model_changed)
+        
         # set the status check interval for the while loop (responsivity)
         time.sleep(0.02)
-
-    print(773)
 
 finally:
     if os.path.exists(ready):
         os.remove(ready)
+    if os.path.exists(model_changed):
+        os.remove(model_changed)
     dest = str(datetime.now())[0:19]
     if os.path.exists(INPUT_PATH): 
         os.rename(INPUT_PATH, str('audio/archive/f_in_' + dest + '.wav'))
     if os.path.exists(OUTPUT_PATH):
         os.rename(OUTPUT_PATH, str('audio/archive/f_out_' + dest + '.wav'))
     GPIO.output(led0pin, GPIO.LOW)
-    print(782)
