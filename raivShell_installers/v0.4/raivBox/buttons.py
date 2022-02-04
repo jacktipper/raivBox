@@ -54,7 +54,7 @@ rec_cmd = str(
 if os.path.exists('synth.py'):
     play_cmd = str("exec aplay audio/output.wav")
     synth = subprocess.Popen( # initialize the synth loop
-        ["./init-synth.sh"], cwd=directory, stdout=subprocess.PIPE, shell=True)
+        ["./init-synth.sh"], cwd=directory, shell=True)
 else:
     play_cmd = str("exec aplay audio/input.wav")
 
