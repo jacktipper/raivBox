@@ -1,0 +1,13 @@
+[Unit]
+Description=I/O level monitoring service
+After=multi-user.target
+
+[Service]
+Environment=XAUTHORITY=/home/rb/.Xauthority
+Environment=DISPLAY=:0
+WorkingDirectory=/home/rb/Desktop/raivShell/analogCtrl
+ExecStartPre=/bin/sleep 2 ; /bin/sh -c "sudo ./initialize-spi.sh"
+ExecStart=/bin/sh -c "python3 boot-knobs.py"
+
+[Install]
+WantedBy=multi-user.target
