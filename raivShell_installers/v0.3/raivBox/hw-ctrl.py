@@ -52,8 +52,10 @@ rec_cmd = str(
     "exec arecord -d 20 -t wav -c 1 -f FLOAT_LE -r 16000 audio/input.wav")
 synth_cmd = str(
     "exec ./run-synth.sh")
-play_cmd = str(
+play1cmd = str(
     "exec aplay audio/output.wav")
+play2cmd = str(
+    "exec aplay audio/input.wav")
 
 try:
     while True:
@@ -73,8 +75,11 @@ try:
                 rec.send_signal(signal.SIGINT)
                 print('Recording Ended')
                 recording = 0
-                synth = subprocess.Popen(
-                    [synth_cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
+                try:
+                    synth = subprocess.Popen(
+                        [synth_cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
+                except:
+                    pass
                 print('Timbre Transfer Engaged')
             prev1value = curr1value
         if curr2value != prev2value:
@@ -82,8 +87,12 @@ try:
             if curr2value == 0:
                 playing = 1
                 print('Playing Recorded Audio')
-                play = subprocess.Popen(
-                    [play_cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
+                try:
+                    play = subprocess.Popen(
+                        [play1cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
+                except:
+                    play = subprocess.Popen(
+                        [play2cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
             if playing == 1 and curr2value == 1:
                 play.send_signal(signal.SIGINT)
                 print('Audio Stopped')
