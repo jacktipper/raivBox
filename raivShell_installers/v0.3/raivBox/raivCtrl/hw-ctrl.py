@@ -3,8 +3,8 @@ import Jetson.GPIO as GPIO
 import signal
 import subprocess
 import os
-os.system('./initialize-python.sh')
-os.system('./initialize-pa.sh')
+os.system('./init-py.sh')
+os.system('./init-pa.sh')
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
