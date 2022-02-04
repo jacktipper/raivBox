@@ -22,10 +22,11 @@ echo '--Updating--' ; echo ; echo ; sleep 2 ; sudo apt update ; sudo apt-mark ho
 echo '--Setting Up VNC Software--' ; echo ; echo ; sleep 2
 sudo apt install vino ; mkdir -p ~/.config/autostart ; cp /usr/share/applications/vino-server.desktop ~/.config/autostart
 gsettings set org.gnome.Vino prompt-enabled false ; gsettings set org.gnome.Vino require-encryption false
-gsettings set org.gnome.Vino authentication-methods "['vnc']" ; gsettings set org.gnome.Vino vnc-password $(echo -n "$PASS"|base64) ; clear
+gsettings set org.gnome.Vino authentication-methods "['vnc']"
+gsettings set org.gnome.Vino vnc-password $(echo -n "$PASS"|base64) ; clear
 
 echo '--Adjusting VNC Settings--' ; echo ; echo ; sleep 2 ; cd /etc/X11/
-echo | sudo tee -a xorg.conf ; echo 'Section "Monitor"' | sudo tee -a xorg.conf ; echo '    Identifier "DSI-0"' | sudo tee -a xorg.conf
+echo | sudo tee -a xorg.conf ; echo 'Section "Monitor"' | sudo tee -a xorg.confecho '    Identifier "DSI-0"' | sudo tee -a xorg.conf
 echo '    Option    "Ignore"' | sudo tee -a xorg.conf ; echo "EndSection" | sudo tee -a xorg.conf ; echo | sudo tee -a xorg.conf
 echo 'Section "Screen"' | sudo tee -a xorg.conf ; echo '    Identifier  "Default Screen"' | sudo tee -a xorg.conf
 echo '    Monitor "Configured Monitor"' | sudo tee -a xorg.conf ; echo '    Device      "Default Device"' | sudo tee -a xorg.conf
@@ -54,25 +55,17 @@ yes | sudo apt-get install nano mlocate libpython3-dev python3-numpy libfreetype
 yes | sudo apt-get install protobuf-compiler libprotobuf-dev openssl libssl-dev libcurl4-openssl-dev
 yes | sudo apt-get install cython3 libxml2-dev libxslt1-dev curl libssl1.0-dev nodejs-dev node-gyp nodejs npm
 sudo npm install -g n ; sudo n stable ; sudo updatedb
-
 sudo -H pip3 install threadpoolctl dominate ; sudo -H pip3 install -U numpy setuptools ; yes | sudo apt-get upgrade
 sudo -H pip3 install llvmlite==0.31 numba==0.48
-
 sudo -H pip3 install matplotlib ipython colorgram.py scikit-build ; sudo -H pip3 install librosa pandas ; clear
 
 echo '--Installing DDSP--' ; echo ; echo ; sleep 2
 sudo apt-get update ; sudo apt-get install libblas-dev liblapack-dev liblapack-doc
-
 sudo -H pip3 install -U pip testresources setuptools==49.6.0 protobuf
 sudo -H pip3 install -U numpy==1.19.4 mock==3.0.5 h5py==2.10.0 keras_preprocessing==1.1.1 # h5py takes a while
 sudo -H pip3 install -U keras_applications==1.0.8 gast==0.2.2 futures pybind11
-
 sudo -H pip3 install --pre --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v46 tensorflow
-# this step takes a while
-
-sudo -H npm install -g @bazel/bazelisk
-# needed for `dm-tree` in DDSP
-
+sudo -H npm install -g @bazel/bazelisk # needed for `dm-tree` in DDSP
 sudo -H pip3 install -U ddsp colorama ; clear
 
 echo '--Installing ADC Connections for Analog Control--' ; echo ; echo ; sleep 2
@@ -90,7 +83,6 @@ sudo touch /etc/systemd/user/boot-leds.service
 sudo cat ~/Desktop/raivBox/raivCtrl/boot-leds_service.txt > /etc/systemd/user/boot-leds.service
 sudo chmod +x /etc/systemd/user/boot-leds.service ; 
 systemctl --user enable boot-leds ; systemctl --user start boot-leds ; clear
-
 sudo touch /etc/systemd/system/boot-knobs.service
 sudo cat ~/Desktop/raivBox/raivCtrl/boot-knobs_service.txt > /etc/systemd/system/boot-knobs.service
 sudo chmod +x /etc/systemd/system/boot-knobs.service ; 
