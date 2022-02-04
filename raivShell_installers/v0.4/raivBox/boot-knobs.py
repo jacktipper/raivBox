@@ -72,7 +72,11 @@ def shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3):
 
 
 powered_on = True
-prev_model = 'acid'
+model_bank = ['acid', 
+              'saxophone', 
+              'violin', 
+              'flute']
+prev_model = model_bank[0] # initialize
 
 while powered_on:
     # assume the pots didn't move yet
@@ -140,11 +144,11 @@ while powered_on:
 
         # set the neural synthesizer model
         if int(set_level) <= int(255/2):
-            model = 'saxophone'
+            model = model_bank[1]
         else:
-            model = 'acid'
+            model = model_bank[0]
         if model != prev_model:
-            os.system("echo '{}' | tee 'models/model.txt'".format(model))
+            os.system("echo '{model}' | sudo tee 'models/model.txt'".format(model=model))
             os.system('touch models/change.d')
         prev_model = model
 
