@@ -52,11 +52,12 @@ rec_cmd = str(
     "exec arecord -d 20 -t wav -c 1 -f FLOAT_LE -r 16000 audio/input.wav")
 
 if os.path.exists('synth.py'):
-    play_cmd = str("exec aplay audio/output.wav")
+    play1cmd = str("exec aplay audio/output.wav")
     synth = subprocess.Popen( # initialize the synth loop
         ["./init-synth.sh"], cwd=directory, shell=True)
 else:
-    play_cmd = str("exec aplay audio/input.wav")
+    play1cmd = str("exec aplay audio/input.wav")
+play2cmd = str("exec aplay audio/input.wav")
 
 try:
     while True:
@@ -82,10 +83,10 @@ try:
             if curr2value == 0:
                 playing = 1
                 print('Playing Recorded Audio')
-                try:
+                if os.path.exists(OUTPUT_PATH):
                     play = subprocess.Popen(
                         [play1cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
-                except:
+                else:
                     play = subprocess.Popen(
                         [play2cmd], cwd=directory, stdout=subprocess.PIPE, shell=True)
             if playing == 1 and curr2value == 1:
