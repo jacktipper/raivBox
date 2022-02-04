@@ -97,3 +97,5 @@ finally:
     GPIO.output(led0pin, GPIO.LOW)
     GPIO.output(led1pin, GPIO.HIGH)
     GPIO.output(led2pin, GPIO.HIGH)
+    sleep(5)
+    os.system('python3 boot-leds.py')
