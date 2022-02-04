@@ -72,6 +72,7 @@ def shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3):
 
 
 powered_on = True
+prev_model = 'acid'
 
 while powered_on:
     # assume the pots didn't move yet
@@ -138,7 +139,7 @@ while powered_on:
         os.system(set_lvl_cmd)
 
         # set the neural synthesizer model
-        if set_level <= int(255/2):
+        if int(set_level) <= int(255/2):
             model = 'saxophone'
         else:
             model = 'acid'

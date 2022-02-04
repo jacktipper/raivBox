@@ -767,9 +767,9 @@ try:
             os.rename(INPUT_PATH, str('audio/archive/in_' + dest + '.wav'))
             os.remove(ready)
 
-            if os.path.exists(model_changed): 
-                MODEL = str(np.genfromtxt('model.txt', str))
-                os.remove(model_changed)
+        if os.path.exists(model_changed): 
+            MODEL = str(np.genfromtxt('model.txt', str))
+            os.remove(model_changed)
         
         # set the status check interval for the while loop (responsivity)
         time.sleep(0.02)
