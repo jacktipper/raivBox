@@ -54,6 +54,7 @@ GPIO.output(led1pin, GPIO.HIGH)
 GPIO.output(led2pin, GPIO.HIGH)
 
 directory = os.getcwd()
+GO = None
 booting = True
 
 while booting:

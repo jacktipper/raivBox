@@ -17,8 +17,30 @@ os.system('./init-py.sh')
 import warnings
 warnings.filterwarnings("ignore")
 
-import gin
 import time
+import Jetson.GPIO as GPIO
+from multiprocessing import Process
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+led0pin = 20
+GPIO.setup(led0pin, GPIO.OUT, initial=GPIO.LOW)
+
+def blinker():
+    try:
+        while True:
+            GPIO.output(led0pin, GPIO.HIGH)
+            time.sleep(0.08)
+            GPIO.output(led0pin, GPIO.LOW)
+            time.sleep(0.12)
+    finally:
+        GPIO.output(led0pin, GPIO.LOW)
+    return
+
+blink = Process(target=blinker)
+blink.start()
+
+import gin
 import librosa
 import pickle
 import numpy as np
@@ -27,21 +49,14 @@ import tensorflow.compat.v2 as tf
 from ddsp.core import make_iterable, hz_to_midi, copy_if_tf_function
 from ddsp.training.models import Autoencoder
 from tensorflow.python.ops.numpy_ops import np_config
-from multiprocessing import Process
 from datetime import datetime
-
-import Jetson.GPIO as GPIO
-
-GPIO.setmode(GPIO.BCM)
-GPIO.setwarnings(False)
-led0pin = 20
-GPIO.setup(led0pin, GPIO.OUT, initial=GPIO.LOW)
 
 if os.path.exists(OUTPUT_PATH): GPIO.output(led0pin, GPIO.HIGH)
 
 # Disable GPU (CUDA and TensorFlow need to be patched)
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
+print(59)
 
 # DDSP Helper Functions (extracted from official modules)
 
@@ -577,28 +592,19 @@ def smooth(x, filter_size=3):
     y = y[:, :, 0] if is_2d else y[0, :, 0]
     return y.numpy()
 
+print(595)
 
-def blinker():
-    try:
-        while True:
-            GPIO.output(led0pin, GPIO.HIGH)
-            time.sleep(0.08)
-            GPIO.output(led0pin, GPIO.LOW)
-            time.sleep(0.12)
-    finally:
-        GPIO.output(led0pin, GPIO.LOW)
-    return
-
-
+blink.terminate()
+blink = None
+GPIO.output(led0pin, GPIO.HIGH)
 
 try:
     while True:
         if os.path.exists(INPUT_PATH):
 
-            blink = None
             blink = Process(target=blinker)
             blink.start()
-
+            print(607)
             # Audio Feature Extraction
             fs = RATE
             x, fs = librosa.load(INPUT_PATH, sr=fs, mono=True)
@@ -754,17 +760,17 @@ try:
                 os.rename('audio/output.wav', str('audio/archive/out_' + dest + '.wav'))
 
             sf.write(OUTPUT_PATH, audio_gen, fs)
+            print('\n\n    Output Successfully Synthesized\n\n')
             blink.terminate()
             blink = None
             GPIO.output(led0pin, GPIO.HIGH)
 
             os.rename('audio/input.wav', str('audio/archive/in_' + dest + '.wav'))
 
-
         # set the status check interval for the while loop (responsivity)
         time.sleep(0.02)
 
-
+    print(773)
 
 finally:
     dest = str(datetime.now())[0:19]
@@ -773,3 +779,4 @@ finally:
     if os.path.exists(OUTPUT_PATH):
         os.rename(OUTPUT_PATH, str('audio/archive/f_out_' + dest + '.wav'))
     GPIO.output(led0pin, GPIO.LOW)
+    print(782)

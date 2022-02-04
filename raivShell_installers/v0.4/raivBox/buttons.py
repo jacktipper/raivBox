@@ -51,9 +51,10 @@ directory = os.getcwd()
 rec_cmd = str(
     "exec arecord -d 20 -t wav -c 1 -f FLOAT_LE -r 16000 audio/input.wav")
 
-if os.path.exists('synth.sh'):
+if os.path.exists('synth.py'):
     play_cmd = str("exec aplay audio/output.wav")
-    os.system('./init-synth.sh') # initialize the synth loop
+    synth = subprocess.Popen( # initialize the synth loop
+        ["./init-synth.sh"], cwd=directory, stdout=subprocess.PIPE, shell=True)
 else:
     play_cmd = str("exec aplay audio/input.wav")
 
