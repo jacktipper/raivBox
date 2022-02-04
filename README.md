@@ -12,7 +12,7 @@ raivBox is a standalone digital neural audio synthesis device based on Google Ma
 
 `Analog_Ctrl` adds hardware control interfacing with the underlying software
 
-#### In the new updated version:
+#### In the upcoming version:
 
 `raivShell` has the installation scripts needed for loading the core dependencies on blank installs
 
