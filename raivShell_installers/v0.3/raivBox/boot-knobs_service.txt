@@ -5,8 +5,8 @@ After=multi-user.target
 [Service]
 Environment=XAUTHORITY=/home/rb/.Xauthority
 Environment=DISPLAY=:0
-WorkingDirectory=/home/rb/Desktop/raivShell/analogCtrl
-ExecStartPre=/bin/sleep 2 ; /bin/sh -c "sudo ./initialize-spi.sh"
+WorkingDirectory=/home/rb/Desktop/raivBox
+ExecStartPre=/bin/sleep 2 ; /bin/sh -c "sudo ./init-spi.sh"
 ExecStart=/bin/sh -c "python3 boot-knobs.py"
 
 [Install]

@@ -6,7 +6,7 @@ After=default.target
 Type=forking
 Environment=XAUTHORITY=/home/rb/.Xauthority
 Environment=DISPLAY=:0
-WorkingDirectory=/home/rb/Desktop/raivShell/analogCtrl
+WorkingDirectory=/home/rb/Desktop/raivBox
 ExecStartPre=/bin/sleep 0.2
 ExecStart=/bin/sh -c "python3 boot-leds.py"
 

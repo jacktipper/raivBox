@@ -1,16 +1,17 @@
 # Hyperparameters
 
 RATE = 16000  # Hz
-AUDIO_FILE = 'audio/recorded/input.wav'
+AUDIO_FILE = 'audio/input.wav'
 PRETRAINED_MODEL = 'acid'  # acid, saxophone
 PLAY_CMD = 'aplay'  # 'aplay' for Linux, 'afplay' for macOS
-AUDIO_OUT = 'audio/rendered/output.wav'
+AUDIO_OUT = 'audio/output.wav'
 
 VOICING_THRESHOLD = -125  # dB
 PITCH_SHIFT = -1  # octaves up or down
 LOUDNESS = 5  # loudness shift (normalized anyway)
 USE_TF = False  # tensorflow or numpy?
-TRACE_MALLOC = False # report system memory usage?
+TIMING = True  # time each section?
+TRACE_MALLOC = False  # report system memory usage?
 
 print('Hyperparameters loaded')
 
@@ -18,13 +19,13 @@ print('Hyperparameters loaded')
 # Libraries
 print('Importing Libraries\n')
 
-import time
-if TRACE_MALLOC: import tracemalloc
 import warnings
+if TIMING: import time
+if TRACE_MALLOC: import tracemalloc
 
 warnings.filterwarnings("ignore")
-start_time = time.time()
-tracemalloc.start()
+if TIMING: start_time = time.time()
+if TRACE_MALLOC: tracemalloc.start()
 
 if TRACE_MALLOC:
     def tracemem(string, seconds=0.01):
@@ -39,43 +40,17 @@ else:
 
 tracemem('start')
 
-import gin
-
-tracemem('gin')
-
-import librosa
-
-tracemem('librosa')
-
-import os
-
-tracemem('os')
-
-import pickle
-
-tracemem('pickle')
-
-import numpy as np
-
-tracemem('np')
-
-import soundfile as sf
-
-tracemem('sf')
-
-import tensorflow.compat.v2 as tf
-
-tracemem('tf', 5.)
-
-from ddsp.core import make_iterable, hz_to_midi, copy_if_tf_function
-
-tracemem('ddsp.core')
-
-from ddsp.training.models import Autoencoder, Model
-
-tracemem('Autoencoder', 5.)
-
+import gin; tracemem('gin')
+import librosa; tracemem('librosa')
+import os; os.system('./init-py.sh'); tracemem('os')
+import pickle; tracemem('pickle')
+import numpy as np; tracemem('np')
+import soundfile as sf; tracemem('sf')
+import tensorflow.compat.v2 as tf; tracemem('tf', 5.)
+from ddsp.core import make_iterable, hz_to_midi, copy_if_tf_function; tracemem('ddsp.core')
+from ddsp.training.models import Autoencoder, Model; tracemem('Autoencoder', 5.)
 from tensorflow.python.ops.numpy_ops import np_config
+from datetime import datetime
 
 # Commands for RAM usage -- commented commands may fix GPU memory leak issue 
 # once CUDA and Tensorflow are patched
@@ -87,7 +62,7 @@ print('tensorflow version:', tf.__version__)
 print('\nTF_GPU_ALLOCATOR:', os.getenv('TF_GPU_ALLOCATOR'))
 print('\nTF_FORCE_GPU_ALLOW_GROWTH:', os.getenv('TF_FORCE_GPU_ALLOW_GROWTH'), '\n')
 
-print('Importing libraries took %.3f seconds' % (time.time() - start_time))
+if TIMING: print('Importing libraries took %.3f seconds' % (time.time() - start_time))
 
 
 # Devices
@@ -97,7 +72,7 @@ print('TensorFlow running on:', devices, '\n')
 
 
 # DDSP Helper Functions (extracted from official modules)
-start_time = time.time()
+if TIMING: start_time = time.time()
 
 # from metrics.py
 
@@ -607,7 +582,7 @@ class QuantileTransformer:
         return self.fit(x).transform(x)
 
 
-print('Loading helper functions took %.3f seconds' %
+if TIMING: print('Loading helper functions took %.3f seconds' %
       (time.time() - start_time))
 
 tracemem('helpers')
@@ -623,8 +598,7 @@ tracemem('audio loaded', 5.)
 print('\nExtracting audio features...')
 
 # Compute features.
-start_time = time.time()
-print('Successfully set start time')
+if TIMING: start_time = time.time()
 audio_features = compute_audio_features(x)
 print('Successfully computed audio features')
 
@@ -634,12 +608,12 @@ audio_features['loudness_db'] = audio_features['loudness_db'].astype(
     np.float32)
 audio_features_mod = None
 
-print('Audio features took %.3f seconds' % (time.time() - start_time))
+if TIMING: print('Audio features took %.3f seconds' % (time.time() - start_time))
 
 tracemem('features', 5.)
 
 # Fixing f0_confidence
-start_time = time.time()
+if TIMING: start_time = time.time()
 audio_features['f0_confidence'] = np.ones(len(audio_features['f0_confidence']))
 
 voicing_threshold = VOICING_THRESHOLD  # dB
@@ -651,13 +625,13 @@ for i in range(len(audio_features['f0_confidence'])):
 audio_features['f0_confidence'] = audio_features['f0_confidence'].astype(
     np.float32)
 
-print('Fixing f0_confidence took %.3f seconds' % (time.time() - start_time))
+if TIMING: print('Fixing f0_confidence took %.3f seconds' % (time.time() - start_time))
 
 
 # Load a model
-start_time = time.time()
+if TIMING: start_time = time.time()
 
-model_dir = 'pretrained/{}'.format(PRETRAINED_MODEL)
+model_dir = 'models/{}'.format(PRETRAINED_MODEL)
 gin_file = os.path.join(model_dir, 'operative_config-0.gin')
 
 # Load the dataset statistics.
@@ -703,7 +677,7 @@ for key in ['f0_hz', 'f0_confidence', 'loudness_db']:
     audio_features[key] = audio_features[key][:time_steps]
 audio_features['audio'] = audio_features['audio'][:n_samples]
 
-print('Loading dataset statistics took %.3f seconds' %
+if TIMING: print('Loading dataset statistics took %.3f seconds' %
       (time.time() - start_time))
 
 
@@ -760,7 +734,7 @@ def smooth(x, filter_size=3):
 
 
 # Adjustments
-start_time = time.time()
+if TIMING: start_time = time.time()
 
 mask_on = None
 
@@ -803,33 +777,25 @@ else:
 audio_features_mod = shift_ld(audio_features_mod, loudness_shift)
 audio_features_mod = shift_f0(audio_features_mod, pitch_shift)
 
-print('Adjusting took %.3f seconds' % (time.time() - start_time))
+if TIMING: print('Adjusting took %.3f seconds' % (time.time() - start_time))
 
-
-# Pickle af
 af = audio_features if audio_features_mod is None else audio_features_mod
 
-with open("af.pkl", "wb") as f:
-    pickle.dump(af, f)
-
-print('Audio features successfully pickled!\n')
-
-
 # Load the model
-start_time = time.time()
+if TIMING: start_time = time.time()
 
 model = Autoencoder()
 
-model.load_weights('pretrained/{}/just_vars/'.format(PRETRAINED_MODEL))
+model.load_weights('models/{}/just_vars/'.format(PRETRAINED_MODEL))
 
-print('Loading model took %.3f seconds\n' % (time.time() - start_time))
+if TIMING: print('Loading model took %.3f seconds\n' % (time.time() - start_time))
 
 
 tracemem('model load', 5.)
 
 
 # Run a batch of predictions.
-start_time = time.time()
+if TIMING: start_time = time.time()
 
 outputs = model(af, training=False)
 
@@ -841,14 +807,11 @@ audio_gen = audio_gen/np.max(audio_gen)
 
 tracemem('audio gen', 5.)
 
-print('Prediction took %.3f seconds' % (time.time() - start_time))
+if TIMING: print('Prediction took %.3f seconds' % (time.time() - start_time))
 
 sf.write(AUDIO_OUT, audio_gen, fs)
 print('Resynthesis Complete')
 
-os.system('{} {}'.format(PLAY_CMD, AUDIO_OUT))
-
-
 # Trace memory usage
 tracemem('total')
-tracemalloc.stop()
+if TRACE_MALLOC: tracemalloc.stop()

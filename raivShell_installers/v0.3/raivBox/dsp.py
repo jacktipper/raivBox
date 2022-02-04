@@ -17,11 +17,11 @@ from datetime import datetime
 
 try:
     dest = str(datetime.now())[0:19]
-    os.rename('audio/rendered/output.wav', str('audio/archive/' + dest + '.wav'))
+    os.rename('audio/output.wav', str('audio/archive/' + dest + '.wav'))
 except:
     pass
 
-x, fs = librosa.load('Audio/input.wav',
+x, fs = librosa.load('audio/input.wav',
                      sr=None, mono=True)
 
 threshold = 0.05
@@ -33,6 +33,6 @@ for n in range(N):
         x[n] = x[n] / np.abs(x[n]) * threshold
     x[n] = x[n] / threshold * norm
 
-sf.write('Audio/output.wav', x, fs)
+sf.write('audio/output.wav', x, fs)
 
 GPIO.output(led0pin, GPIO.HIGH)

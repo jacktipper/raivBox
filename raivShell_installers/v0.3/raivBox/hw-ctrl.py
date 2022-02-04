@@ -49,11 +49,11 @@ GPIO.setup(button2pin, GPIO.IN)
 
 directory = os.getcwd()
 rec_cmd = str(
-    "exec arecord -d 20 -t wav -c 1 -f FLOAT_LE -r 16000 audio/recorded/input.wav")
+    "exec arecord -d 20 -t wav -c 1 -f FLOAT_LE -r 16000 audio/input.wav")
 synth_cmd = str(
     "exec ./run-synth.sh")
 play_cmd = str(
-    "exec aplay audio/rendered/output.wav")
+    "exec aplay audio/output.wav")
 
 try:
     while True:
