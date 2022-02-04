@@ -100,5 +100,9 @@ finally:
     GPIO.output(led0pin, GPIO.LOW)
     GPIO.output(led1pin, GPIO.HIGH)
     GPIO.output(led2pin, GPIO.HIGH)
+    try:
+        synth.send_signal(signal.SIGINT)
+    except:
+        pass
     sleep(5)
     os.system('python3 boot-leds.py')
