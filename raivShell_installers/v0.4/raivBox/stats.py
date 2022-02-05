@@ -389,6 +389,7 @@ while booting:           # "1234567890123456789012"
     disp.display()
     time.sleep(1.14)
     booting = False
+    if not booting: break
 
 
 while True:
