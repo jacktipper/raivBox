@@ -31,6 +31,9 @@ from PIL import ImageDraw
 from PIL import ImageFont
 
 import subprocess
+import os
+
+os.system("./~/Desktop/raivBox/init-pa.sh")
 
 
 def get_network_interface_state(interface):
@@ -430,15 +433,17 @@ while True:
     
     draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
     # cmd = "pactl list sources | grep '^[[:space:]]Volume:' | head -n $(( $SOURCE + 2 )) | tail -n 1 | grep -oP '[0-9]+[0-9]+(?=%)'"
-    # InVol = subprocess.check_output(cmd, shell=True).decode('ascii')[:-1]
+    # InVol = subprocess.check_output(cmd, shell=True).decode('ascii')[:2]
+    # print(InVol)
     # cmd = "pactl list sinks | grep '^[[:space:]]Volume:' | head -n $(( $SINK + 1 )) | tail -n 1 | grep -oP '[0-9]+[0-9]+(?=%)'"
-    # OutVol = subprocess.check_output(cmd, shell=True).decode('ascii')[:-1]
-    
-    # if InVol > 5 or OutVol > 5:
+    # OutVol = subprocess.check_output(cmd, shell=True).decode('ascii')[:2]
+    # print(OutVol)
+
+    # if int(InVol) < 5 or int(OutVol) < 5:
     #     # Show the amount of disk being used
     #     draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
     # else:
-    #     draw.text((x, top+25), str(" IN LVL: " + InVol + "  OUT LVL: " + OutVol), font=font, fill=255)
+    #     draw.text((x, top+25), str(" INPUT: " + InVol + "  OUTPUT: " + OutVol), font=font, fill=255)
 
     # Display image.
     # Set the SSD1306 image to the PIL image we have made, then dispaly
