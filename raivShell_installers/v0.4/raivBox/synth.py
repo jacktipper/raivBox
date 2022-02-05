@@ -631,9 +631,11 @@ try:
 
 
             # Load a model
-            PRETRAINED_MODEL = str(open('models/model.txt').read())
-            print('Model Loaded: ', PRETRAINED_MODEL)
-            model_dir = 'models/{}'.format(PRETRAINED_MODEL)
+            cwd = os.getcwd()
+            print('CWD:', cwd, '\n\n')
+            MODEL = open('models/model.txt').read()[0:-1]
+            print('Model Loaded:', MODEL)
+            model_dir = 'models/{}'.format(MODEL)
             gin_file = os.path.join(model_dir, 'operative_config-0.gin')
 
             # Load the dataset statistics.
@@ -744,7 +746,7 @@ try:
 
             # Load the model
             model = Autoencoder()
-            model.load_weights('models/{}/just_vars/'.format(PRETRAINED_MODEL))
+            model.load_weights('models/{}/just_vars/'.format(MODEL))
 
 
             # Run inference
