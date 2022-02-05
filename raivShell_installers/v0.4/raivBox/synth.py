@@ -50,6 +50,13 @@ from ddsp.training.models import Autoencoder
 from tensorflow.python.ops.numpy_ops import np_config
 from datetime import datetime
 
+# Disable np.genfromtxt() cache
+from np.lib._datasource import DataSource
+#def open(path, mode='r', destpath=os.curdir):
+def openm(path, mode='r', destpath=None):
+  ds = DataSource(destpath)
+  return ds.open(path, mode)
+np.lib._datasource.open=openm
 
 # Disable GPU (CUDA and TensorFlow need to be patched)
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
@@ -632,6 +639,7 @@ try:
 
             # Load a model
             MODEL = str(np.genfromtxt('model.txt', str))
+            print('Model Loaded: ', MODEL)
             model_dir = 'models/{}'.format(MODEL)
             gin_file = os.path.join(model_dir, 'operative_config-0.gin')
 
