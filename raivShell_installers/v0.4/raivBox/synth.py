@@ -593,7 +593,7 @@ def smooth(x, filter_size=3):
 blink.terminate()
 blink = None
 GPIO.output(led0pin, GPIO.HIGH)
-ready = 'audio/ready'
+ready = 'audio/read.y'
 
 try:
     while True:

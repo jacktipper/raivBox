@@ -55,8 +55,8 @@ def shutdown_check(value, src):
             condition = True
         else:
             condition = False
-    if src == 'fan':
-        if value > 250:
+    if src == 'mod':
+        if value < 5:
             condition = True
         else:
             condition = False
@@ -106,9 +106,9 @@ while powered_on:
         set_in_vol = remap_range(trim_input, 0, 65535, 0, 100)
 
         # set OS input volume
-        print('Input Volume = {volume}%' .format(volume=set_in_vol))
-        set_in_vol_cmd = 'pactl set-source-volume 1 {volume}%' \
-            .format(volume=set_in_vol)
+        print('Input Volume = {}%' .format(set_in_vol))
+        set_in_vol_cmd = 'pactl set-source-volume 1 {}%' \
+            .format(set_in_vol)
         os.system(set_in_vol_cmd)
 
         # save the pot reading for the next loop
@@ -121,9 +121,9 @@ while powered_on:
         set_out_vol = remap_range(trim_output, 0, 65535, 0, 100)
 
         # set OS output volume
-        print('Output Volume = {volume}%' .format(volume=set_out_vol))
-        set_out_vol_cmd = 'pactl set-sink-volume 0 {volume}%' \
-            .format(volume=set_out_vol)
+        print('Output Volume = {}%' .format(set_out_vol))
+        set_out_vol_cmd = 'pactl set-sink-volume 0 {}%' \
+            .format(set_out_vol)
         os.system(set_out_vol_cmd)
 
         # save the pot reading for the next loop
@@ -133,28 +133,21 @@ while powered_on:
 
     if trim_top_changed:
         # convert 16bit adc value into 0-255 level
-        set_level = remap_range(trim_top, 0, 65535, 0, 255)
-
-        # set fan speed
-        print('Fan Speed = {level}' .format(level=set_level))
-        set_lvl_cmd = \
-            "echo '{level}' | sudo tee /sys/devices/pwm-fan/target_pwm" \
-            .format(level=set_level)
-        os.system(set_lvl_cmd)
+        set_model = remap_range(trim_top, 0, 65535, 0, 100)
 
         # set the neural synthesizer model
-        if int(set_level) <= int(255/2):
+        if int(set_model) <= int(100/2):
             model = model_bank[1]
         else:
             model = model_bank[0]
         if model != prev_model:
-            os.system("echo '{model}' | sudo tee 'models/model.txt'".format(model=model))
+            os.system("echo '{}' | sudo tee 'models/model.txt'" .format(model))
         prev_model = model
 
         # save the pot reading for the next loop
         top_last_read = trim_top
 
-        sd_cond_3 = shutdown_check(set_level, 'fan')
+        sd_cond_3 = shutdown_check(set_model, 'mod')
 
     # wait for a moment to save processing power
     sleep(0.02)
@@ -162,6 +155,6 @@ while powered_on:
     sd_cmd = shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3)
     if sd_cmd == True:
         powered_on = False
-        os.system("echo '0' | sudo tee /sys/devices/pwm-fan/target_pwm")
+        os.system("echo '255' | sudo tee /sys/devices/pwm-fan/target_pwm")
         os.system('python3 sd-leds.py')
         os.system('sudo shutdown now')

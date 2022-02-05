@@ -77,7 +77,7 @@ try:
                 rec.send_signal(signal.SIGINT)
                 recording = 0
                 print('Recording Ended')
-                os.system('touch audio/ready') # flag that the input is fully recorded
+                os.system('touch audio/read.y') # flag that the input is fully recorded
             prev1value = curr1value
         if curr2value != prev2value:
             GPIO.output(led2pin, not curr2value)
