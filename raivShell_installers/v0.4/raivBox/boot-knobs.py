@@ -138,7 +138,8 @@ while powered_on:
 
         # set the neural synthesizer model
         if set_model < 2:
-            model = 'power down'
+            # model = 'power down'
+            model = model_bank[0]
         elif set_model <= 20:
             model = model_bank[0]
         elif set_model <= 40:
