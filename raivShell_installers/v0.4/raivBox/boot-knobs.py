@@ -73,8 +73,9 @@ def shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3):
 
 powered_on = True
 model_bank = ['acid', 
-              'saxophone', 
-              'violin', 
+              'saxophone',
+              'violin',
+              'trumpet',
               'flute']
 prev_model = model_bank[0] # initialize
 
@@ -136,10 +137,16 @@ while powered_on:
         set_model = remap_range(trim_top, 0, 65535, 0, 100)
 
         # set the neural synthesizer model
-        if int(set_model) <= int(100/2):
-            model = model_bank[1]
-        else:
+        if set_model <= 20:
             model = model_bank[0]
+        elif set_model <= 40:
+            model = model_bank[1]
+        elif set_model <= 60:
+            model = model_bank[2]
+        elif set_model <= 80:
+            model = model_bank[3]
+        else:
+            model = model_bank[4]
         if model != prev_model:
             os.system("echo '{}' | sudo tee 'models/model.txt'" .format(model))
         prev_model = model

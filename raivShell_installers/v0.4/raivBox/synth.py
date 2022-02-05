@@ -744,7 +744,7 @@ try:
 
             # Load the model
             model = Autoencoder()
-            model.load_weights('models/{}/just_vars/'.format(MODEL))
+            model.load_weights('models/{}/model_data/'.format(MODEL))
 
 
             # Run inference
@@ -760,7 +760,7 @@ try:
 
             sf.write(OUTPUT_PATH, audio_gen, fs)
             print('\n    Output Successfully Synthesized\n')
-            
+
             blink.terminate()
             blink = None
             GPIO.output(led0pin, GPIO.HIGH)
@@ -780,4 +780,3 @@ finally:
     if os.path.exists(OUTPUT_PATH):
         os.rename(OUTPUT_PATH, str('audio/archive/f_out_' + dest + '.wav'))
     GPIO.output(led0pin, GPIO.LOW)
-print(782)
