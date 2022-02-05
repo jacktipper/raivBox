@@ -49,7 +49,7 @@ def get_ip_address(interface):
 def get_cpu_usage():
     # Shell scripts for system monitoring from here : https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
     cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
-    CPU = subprocess.check_output(cmd, shell=True)
+    CPU = subprocess.check_output(cmd, shell=True).decode('ascii')[:-1]
     return CPU
 
 # Return a float representing the percentage of GPU in use.
@@ -104,31 +104,33 @@ while True:
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
     # Shell scripts for system monitoring from here : https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-    cmd = "free -m | awk 'NR==2{printf \"Mem:  %.0f%% %s/%s M\", $3*100/$2, $3,$2 }'"
+    cmd = "free -m | awk 'NR==2{printf \" Mem:  %.0f%% %s/%sM \", $3*100/$2, $3,$2 }'"
     MemUsage = subprocess.check_output(cmd, shell=True)
-    cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%dGB %s\", $3,$2,$5}'"
+    cmd = "df -h | awk '$NF==\"/\"{printf \" Disk: %d/%dGB %s\", $3,$2,$5}'"
     Disk = subprocess.check_output(cmd, shell=True)
+
+    # Show the current neural synthesizer model instead of GPU
+    Model = subprocess.check_output("cat ~/Desktop/raivBox/models/model.txt", shell=True).decode('ascii')[:-1]
+    draw.text((x, top), str(" Model: " + Model.upper()), font=font, fill=255)
 
     # Print the IP address
     # Two examples here, wired and wireless
-    draw.text((x, top),       "IP:   " +
-              str(get_ip_address('wlan0')),  font=font, fill=255)
-    # draw.text((x, top+8),     "wlan0: " + str(get_ip_address('wlan0')), font=font, fill=255)
+    draw.text((x, top+8), " IP:   " + str(get_ip_address('wlan0')),  font=font, fill=255)
 
     # Alternate solution: Draw the GPU usage as text
     # draw.text((x, top+8),     "GPU:  " +"{:3.1f}".format(GPU)+" %", font=font, fill=255)
     # We draw the GPU usage as a bar graph
-    string_width, string_height = font.getsize("GPU:  ")
+    string_width, string_height = font.getsize(" GPU:   ")
     # Figure out the width of the bar
     full_bar_width = width-(x+string_width)-1
     gpu_usage = get_gpu_usage()
     # Avoid divide by zero ...
-    if gpu_usage == 0.0:
-        gpu_usage = 0.001
-    draw_bar_width = int(full_bar_width*(gpu_usage/100))
-    draw.text((x, top+8),     "GPU:  ", font=font, fill=255)
-    draw.rectangle((x+string_width, top+12, x+string_width +
-                    draw_bar_width, top+14), outline=1, fill=1)
+    # if gpu_usage == 0.0:
+    #     gpu_usage = 0.001
+    # draw_bar_width = int(full_bar_width*(gpu_usage/100))
+    # draw.text((x, top+8),     "GPU:  ", font=font, fill=255)
+    # draw.rectangle((x+string_width, top+12, x+string_width +
+    #                 draw_bar_width, top+14), outline=1, fill=1)
 
     # Show the memory Usage
     draw.text((x, top+16), str(MemUsage.decode('utf-8')), font=font, fill=255)
@@ -140,4 +142,4 @@ while True:
     disp.image(image)
     disp.display()
     # 1.0 = 1 second; The divisor is the desired updates (frames) per second
-    time.sleep(1.0/4)
+    time.sleep(0.25)

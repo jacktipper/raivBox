@@ -137,7 +137,9 @@ while powered_on:
         set_model = remap_range(trim_top, 0, 65535, 0, 100)
 
         # set the neural synthesizer model
-        if set_model <= 20:
+        if set_model < 2:
+            model = 'power down'
+        elif set_model <= 20:
             model = model_bank[0]
         elif set_model <= 40:
             model = model_bank[1]
