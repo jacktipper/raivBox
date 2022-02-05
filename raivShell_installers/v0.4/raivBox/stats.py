@@ -389,7 +389,6 @@ while booting:           # "1234567890123456789012"
     disp.display()
     time.sleep(1.14)
     booting = False
-    if not booting: break
 
 
 while True:
@@ -398,9 +397,9 @@ while True:
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
     # Shell scripts for system monitoring from here : https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-    cmd = "free -m | awk 'NR==2{printf \" RAM: %.0f%% %s/%sM \", $3*100/$2, $3,$2 }'"
+    cmd = "free -m | awk 'NR==2{printf \" Mem:  %.0f%% %s/%sM \", $3*100/$2, $3,$2 }'"
     MemUsage = subprocess.check_output(cmd, shell=True)
-    cmd = "df -h | awk '$NF==\"/\"{printf \" SD: %d/%dGB \", $3,$2 }'"
+    cmd = "df -h | awk '$NF==\"/\"{printf \" Disk: %s %d/%dGB \", $5, $3,$2 }'"
     Disk = subprocess.check_output(cmd, shell=True)
 
     # Show the current neural synthesizer model instead of GPU
@@ -409,7 +408,7 @@ while True:
 
     # Print the IP address
     # Two examples here, wired and wireless
-    draw.text((x, top+8), " IP:  " + str(get_ip_address('wlan0')),  font=font, fill=255)
+    draw.text((x, top+8), " IP:   " + str(get_ip_address('wlan0')),  font=font, fill=255)
 
     # Alternate solution: Draw the GPU usage as text
     # draw.text((x, top+8),     "GPU:  " +"{:3.1f}".format(GPU)+" %", font=font, fill=255)
@@ -426,13 +425,20 @@ while True:
     # draw.rectangle((x+string_width, top+12, x+string_width +
     #                 draw_bar_width, top+14), outline=1, fill=1)
 
-    InVol = subprocess.check_output("pactl list sources | grep '^[[:space:]]Volume:' | head -n $(( $SOURCE + 2 )) | tail -n 1 | grep -oP '[0-9]+[0-9]+(?=%)'", shell=True).decode('ascii')[:-1]
-    print(InVol, type(InVol))
-    OutVol = subprocess.check_output("pactl list sinks | grep '^[[:space:]]Volume:' | head -n $(( $SINK + 1 )) | tail -n 1 | grep -oP '[0-9]+[0-9]+(?=%)'", shell=True).decode('ascii')[:-1]
     # Show the memory Usage
     draw.text((x, top+16), str(MemUsage.decode('utf-8')), font=font, fill=255)
-    # Show the amount of disk being used
-    draw.text((x, top+25), "I:" + str(InVol.decode('utf-8')) + "" + str(Disk.decode('utf-8')) + "O:" + str(OutVol.decode('utf-8')), font=font, fill=255)
+    
+    draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
+    # cmd = "pactl list sources | grep '^[[:space:]]Volume:' | head -n $(( $SOURCE + 2 )) | tail -n 1 | grep -oP '[0-9]+[0-9]+(?=%)'"
+    # InVol = subprocess.check_output(cmd, shell=True).decode('ascii')[:-1]
+    # cmd = "pactl list sinks | grep '^[[:space:]]Volume:' | head -n $(( $SINK + 1 )) | tail -n 1 | grep -oP '[0-9]+[0-9]+(?=%)'"
+    # OutVol = subprocess.check_output(cmd, shell=True).decode('ascii')[:-1]
+    
+    # if InVol > 5 or OutVol > 5:
+    #     # Show the amount of disk being used
+    #     draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
+    # else:
+    #     draw.text((x, top+25), str(" IN LVL: " + InVol + "  OUT LVL: " + OutVol), font=font, fill=255)
 
     # Display image.
     # Set the SSD1306 image to the PIL image we have made, then dispaly
