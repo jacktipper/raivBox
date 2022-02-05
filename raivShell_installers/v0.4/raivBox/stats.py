@@ -442,7 +442,7 @@ while True:
     if InVol > 99: InVol = '99'
     if OutVol > 99: OutVol = '99'
     if InVol < 10: InVol = ' {}'.format(InVol)
-    if OutVol < 10: InVol = ' {}'.format(OutVol)
+    if OutVol < 10: OutVol = ' {}'.format(OutVol)
 
     if int(InVol) < 26 or int(OutVol) < 26:
         # Show the volume levels
