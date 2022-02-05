@@ -601,7 +601,7 @@ try:
 
             blink = Process(target=blinker)
             blink.start()
-            print(607)
+            
             # Audio Feature Extraction
             fs = RATE
             x, fs = librosa.load(INPUT_PATH, sr=fs, mono=True)
@@ -631,8 +631,6 @@ try:
 
 
             # Load a model
-            cwd = os.getcwd()
-            print('CWD:', cwd, '\n\n')
             MODEL = open('models/model.txt').read()[0:-1]
             print('Model Loaded:', MODEL)
             model_dir = 'models/{}'.format(MODEL)
@@ -761,7 +759,8 @@ try:
                 os.rename(OUTPUT_PATH, str('audio/archive/out_' + dest + '.wav'))
 
             sf.write(OUTPUT_PATH, audio_gen, fs)
-            print('\n\n    Output Successfully Synthesized\n\n')
+            print('\n    Output Successfully Synthesized\n')
+            
             blink.terminate()
             blink = None
             GPIO.output(led0pin, GPIO.HIGH)
