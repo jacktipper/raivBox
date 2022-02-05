@@ -31,9 +31,6 @@ from PIL import ImageDraw
 from PIL import ImageFont
 
 import subprocess
-import os
-
-os.system("./~/Desktop/raivBox/init-pa.sh")
 
 
 def get_network_interface_state(interface):
@@ -431,19 +428,28 @@ while True:
     # Show the memory Usage
     draw.text((x, top+16), str(MemUsage.decode('utf-8')), font=font, fill=255)
     
-    draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
-    # cmd = "pactl list sources | grep '^[[:space:]]Volume:' | head -n $(( $SOURCE + 2 )) | tail -n 1 | grep -oP '[0-9]+[0-9]+(?=%)'"
-    # InVol = subprocess.check_output(cmd, shell=True).decode('ascii')[:2]
-    # print(InVol)
-    # cmd = "pactl list sinks | grep '^[[:space:]]Volume:' | head -n $(( $SINK + 1 )) | tail -n 1 | grep -oP '[0-9]+[0-9]+(?=%)'"
-    # OutVol = subprocess.check_output(cmd, shell=True).decode('ascii')[:2]
-    # print(OutVol)
+    # draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
+    cmd = "cat ~/Desktop/raivBox/invol.txt"
+    try:
+        InVol = int(subprocess.check_output(cmd, shell=True).decode('ascii'))
+    except:
+        InVol = 0
+    cmd = "cat ~/Desktop/raivBox/outvol.txt"
+    try:
+        OutVol = int(subprocess.check_output(cmd, shell=True).decode('ascii'))
+    except:
+        OutVol = 0
+    if InVol > 99: InVol = '99'
+    if OutVol > 99: OutVol = '99'
+    if InVol < 10: InVol = ' {}'.format(InVol)
+    if OutVol < 10: InVol = ' {}'.format(OutVol)
 
-    # if int(InVol) < 5 or int(OutVol) < 5:
-    #     # Show the amount of disk being used
-    #     draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
-    # else:
-    #     draw.text((x, top+25), str(" INPUT: " + InVol + "  OUTPUT: " + OutVol), font=font, fill=255)
+    if int(InVol) < 26 or int(OutVol) < 26:
+        # Show the volume levels
+        draw.text((x, top+25), " IN: " + str(InVol) + "%    OUT: " + str(OutVol) + "%", font=font, fill=255)   
+    else:
+        # Show the amount of disk being used
+        draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
 
     # Display image.
     # Set the SSD1306 image to the PIL image we have made, then dispaly

@@ -71,6 +71,11 @@ def shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3):
     return sd_cmd
 
 
+# initialize input and output volume reports
+os.system("echo '01' | tee invol.txt")
+os.system("echo '01' | tee outvol.txt")
+
+
 powered_on = True
 model_bank = ['acid', 
               'saxophone',
@@ -111,6 +116,7 @@ while powered_on:
         set_in_vol_cmd = 'pactl set-source-volume 1 {}%' \
             .format(set_in_vol)
         os.system(set_in_vol_cmd)
+        os.system("echo '{}' | tee invol.txt".format(int(set_in_vol)))
 
         # save the pot reading for the next loop
         in_last_read = trim_input
@@ -126,6 +132,7 @@ while powered_on:
         set_out_vol_cmd = 'pactl set-sink-volume 0 {}%' \
             .format(set_out_vol)
         os.system(set_out_vol_cmd)
+        os.system("echo '{}' | tee outvol.txt".format(int(set_out_vol)))
 
         # save the pot reading for the next loop
         out_last_read = trim_output
