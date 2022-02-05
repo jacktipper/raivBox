@@ -631,9 +631,9 @@ try:
 
 
             # Load a model
-            MODEL = open('model.txt').read()
-            print('Model Loaded: ', MODEL)
-            model_dir = 'models/{}'.format(MODEL)
+            PRETRAINED_MODEL = str(open('model.txt').read())
+            print('Model Loaded: ', PRETRAINED_MODEL)
+            model_dir = 'models/{}'.format(PRETRAINED_MODEL)
             gin_file = os.path.join(model_dir, 'operative_config-0.gin')
 
             # Load the dataset statistics.
@@ -744,7 +744,7 @@ try:
 
             # Load the model
             model = Autoencoder()
-            model.load_weights('models/{}/just_vars/'.format(MODEL))
+            model.load_weights('models/{}/just_vars/'.format(PRETRAINED_MODEL))
 
 
             # Run inference
@@ -779,3 +779,4 @@ finally:
     if os.path.exists(OUTPUT_PATH):
         os.rename(OUTPUT_PATH, str('audio/archive/f_out_' + dest + '.wav'))
     GPIO.output(led0pin, GPIO.LOW)
+print(782)
