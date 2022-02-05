@@ -589,13 +589,11 @@ def smooth(x, filter_size=3):
     y = y[:, :, 0] if is_2d else y[0, :, 0]
     return y.numpy()
 
-MODEL = str(np.genfromtxt('model.txt', str))
 
 blink.terminate()
 blink = None
 GPIO.output(led0pin, GPIO.HIGH)
 ready = 'audio/read.y'
-model_changed = 'models/change.d'
 
 try:
     while True:
@@ -633,6 +631,7 @@ try:
 
 
             # Load a model
+            MODEL = str(np.genfromtxt('model.txt', str))
             model_dir = 'models/{}'.format(MODEL)
             gin_file = os.path.join(model_dir, 'operative_config-0.gin')
 
@@ -766,10 +765,6 @@ try:
 
             os.rename(INPUT_PATH, str('audio/archive/in_' + dest + '.wav'))
             os.remove(ready)
-
-        if os.path.exists(model_changed): 
-            MODEL = str(np.genfromtxt('model.txt', str))
-            os.remove(model_changed)
         
         # set the status check interval for the while loop (responsivity)
         time.sleep(0.02)
@@ -777,8 +772,6 @@ try:
 finally:
     if os.path.exists(ready):
         os.remove(ready)
-    if os.path.exists(model_changed):
-        os.remove(model_changed)
     dest = str(datetime.now())[0:19]
     if os.path.exists(INPUT_PATH): 
         os.rename(INPUT_PATH, str('audio/archive/f_in_' + dest + '.wav'))

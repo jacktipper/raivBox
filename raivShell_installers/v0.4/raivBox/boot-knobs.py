@@ -149,7 +149,6 @@ while powered_on:
             model = model_bank[0]
         if model != prev_model:
             os.system("echo '{model}' | sudo tee 'models/model.txt'".format(model=model))
-            os.system('touch models/change.d')
         prev_model = model
 
         # save the pot reading for the next loop
