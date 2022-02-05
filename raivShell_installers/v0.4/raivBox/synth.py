@@ -631,7 +631,7 @@ try:
 
 
             # Load a model
-            PRETRAINED_MODEL = str(open('model.txt').read())
+            PRETRAINED_MODEL = str(open('models/model.txt').read())
             print('Model Loaded: ', PRETRAINED_MODEL)
             model_dir = 'models/{}'.format(PRETRAINED_MODEL)
             gin_file = os.path.join(model_dir, 'operative_config-0.gin')
