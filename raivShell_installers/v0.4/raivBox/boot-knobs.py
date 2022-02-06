@@ -65,6 +65,7 @@ def shutdown_check(value, src):
 
 def shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3):
     if sd_cond_1 == True and sd_cond_2 == True and sd_cond_3 == True:
+        os.system("touch shut.down")
         sd_cmd = True
     else:
         sd_cmd = False

@@ -54,7 +54,7 @@ GPIO.output(led1pin, GPIO.HIGH)
 GPIO.output(led2pin, GPIO.HIGH)
 
 directory = os.getcwd()
-GO = None ; gone = False
+GOING = None ; gone = False
 booting = True
 
 try:
@@ -67,11 +67,11 @@ try:
             GPIO.output(led2pin, GPIO.LOW)
             booting = False
             GPIO.cleanup()
-            GO = subprocess.Popen(['python3 buttons.py'],
+            GOING = subprocess.Popen(['python3 buttons.py'],
                                   cwd=directory, shell=True)
             gone = True
         sleep(0.02)
-finally:
+except:
     if not gone:
-        GO = subprocess.Popen(['python3 buttons.py'],
+        GOING = subprocess.Popen(['python3 buttons.py'],
                               cwd=directory, shell=True)

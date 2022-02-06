@@ -19,10 +19,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+#
 # Portions copyright (c) NVIDIA 2019
 # Portions copyright (c) JetsonHacks 2019
+# Portions copyright (c) 2022 RAIV - Jack Tipper
 
 import time
+import os
 
 import Adafruit_SSD1306   # This is the driver chip for the Adafruit PiOLED
 
@@ -390,7 +393,6 @@ while booting:           # "1234567890123456789012"
     time.sleep(1.14)
     booting = False
 
-
 while True:
 
     # Draw a black filled box to clear the image.
@@ -455,5 +457,20 @@ while True:
     # Set the SSD1306 image to the PIL image we have made, then dispaly
     disp.image(image)
     disp.display()
+
+    if os.path.exists("~/Desktop/raivBox/shut.down"):
+        break
+
     # 1.0 = 1 second; The divisor is the desired updates (frames) per second
-    time.sleep(0.25)
+    time.sleep(0.16)
+
+if os.path.exists("~/Desktop/raivBox/shut.down"):
+    os.remove("~/Desktop/raivBox/shut.down")
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    draw.text((x, top),    "                      ", font=font, fill=255)
+    draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
+    draw.text((x, top+16), "         DOWN         ", font=font, fill=255)
+    draw.text((x, top+25), "                      ", font=font, fill=255)
+    disp.image(image)
+    disp.display()
+    time.sleep(3)
