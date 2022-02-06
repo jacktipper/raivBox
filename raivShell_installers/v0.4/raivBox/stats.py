@@ -461,7 +461,6 @@ while powered_on:
 
     if os.path.exists("~/Desktop/raivBox/flags/shut.down"):
         powered_on = False
-        os.remove("~/Desktop/raivBox/flags/shut.down")
         draw.rectangle((0, 0, width, height), outline=0, fill=0)
         draw.text((x, top),    "                      ", font=font, fill=255)
         draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
