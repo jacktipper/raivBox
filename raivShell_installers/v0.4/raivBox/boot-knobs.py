@@ -175,4 +175,5 @@ while powered_on:
         os.system("touch flags/shut.down")
         os.system("echo '255' | sudo tee /sys/devices/pwm-fan/target_pwm")
         os.system('python3 sd-leds.py')
+        sleep(0.34)
         os.system('sudo shutdown now')
