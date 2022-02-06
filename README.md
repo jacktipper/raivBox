@@ -4,7 +4,7 @@ raivBox is a standalone neural audio synthesis device based on Google Magenta's 
 
 ![raivBox logo](https://github.com/jacktipper/raivBox/blob/main/graphics/raivBox_logo.png)
 
-The `raivBox` folder contains all of the important files and scripts.
+The `raivBox/` folder contains all of the important files and scripts.
 
 To initialize a blank NVIDIA Jetson Nano 2GB operating system img with the required dependencies for this project, first flash the OS onto the Jetson, complete the basic user setup wizard, and then follow the instructions in the header of `raivBox/raivShell.sh`.
 
