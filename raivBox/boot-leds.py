@@ -92,11 +92,11 @@ try:
             GPIO.output(led0pin, GPIO.LOW)
             GPIO.output(led1pin, GPIO.LOW)
             GPIO.output(led2pin, GPIO.LOW)
-            booting = False
             GPIO.cleanup()
             going = subprocess.Popen(['python3 buttons.py'],
                                   cwd=directory, shell=True)
             gone = True
+            booting = False
         sleep(0.02)
 except:
     """If the while loop returns an exception and 'buttons.py' has 
