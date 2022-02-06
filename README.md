@@ -10,8 +10,6 @@ To initialize a blank NVIDIA Jetson Nano 2GB operating system img with the requi
 
 In later versions of this repository, a hyperlink to a fully-baked OS img will be provided. Flashing this img to a Jetson's SD card will pre-load all of the software needed for this project.
 
-![raivBox render](https://github.com/jacktipper/raivBox/blob/main/graphics/raivBox_render.png)
-
 The DDSP synthesis is rendered in `raivBox/synth.py`.
 
 Useful system stats and UI animations are displayed via `raivBox/stats.py`.
