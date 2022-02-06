@@ -1,1 +1,0 @@
-sudo telinit 3
