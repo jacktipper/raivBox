@@ -457,7 +457,7 @@ while powered_on:
     disp.display()
 
     try:
-        powered_on = bool(subprocess.check_output("cat ~/Desktop/raivBox/flags/state.txt", shell=True).decode('ascii'))
+        powered_on = bool(int(subprocess.check_output("cat ~/Desktop/raivBox/flags/state.txt", shell=True).decode('ascii')))
     except:
         powered_on = True
 
