@@ -462,14 +462,15 @@ while powered_on:
         powered_on = True
 
     if not powered_on:
-        draw.rectangle((0, 0, width, height), outline=0, fill=0)
-        draw.text((x, top),    "                      ", font=font, fill=255)
-        draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
-        draw.text((x, top+16), "         DOWN         ", font=font, fill=255)
-        draw.text((x, top+25), "                      ", font=font, fill=255)
-        disp.image(image)
-        disp.display()
-        # time.sleep(3)
+        while not powered_on:
+                draw.rectangle((0, 0, width, height), outline=0, fill=0)
+                draw.text((x, top),    "                      ", font=font, fill=255)
+                draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
+                draw.text((x, top+16), "         DOWN         ", font=font, fill=255)
+                draw.text((x, top+25), "                      ", font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                time.sleep(3)
     else:
         # 1.0 = 1 second; The divisor is the desired updates (frames) per second
         time.sleep(0.16)
