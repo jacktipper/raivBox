@@ -19,21 +19,25 @@ import os
 import subprocess
 os.system('./init-py.sh')
 
+
+"""Set up GPIO control/interaction for the LEDs and control buttons."""
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
 led0pin = 20
 led1pin = 21
-button1pin = 27
 led2pin = 16
+button1pin = 27
 button2pin = 26
 
 GPIO.setup(led0pin, GPIO.OUT, initial=GPIO.LOW)
 GPIO.setup(led1pin, GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup(button1pin, GPIO.IN)
 GPIO.setup(led2pin, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(button1pin, GPIO.IN)
 GPIO.setup(button2pin, GPIO.IN)
 
+
+"""Send a boot-up blink sequence to the three red status LEDs."""
 for i in range(3):
     GPIO.output(led0pin, GPIO.HIGH)
     sleep(0.08)
@@ -68,8 +72,16 @@ GPIO.output(led0pin, GPIO.HIGH)
 GPIO.output(led1pin, GPIO.HIGH)
 GPIO.output(led2pin, GPIO.HIGH)
 
+
+"""This loop and `try/except` listens for when both of the hardware
+buttons are simultaneously depressed, and runs 'buttons.py' once
+the condition is met. The `going` variable is used for the subprocess
+that runs 'buttons.py', and `gone` is the flag for whether or not
+`going` has been executed. 
+"""
 directory = os.getcwd()
-GOING = None ; gone = False
+going = None
+gone = False
 booting = True
 
 try:
@@ -82,11 +94,15 @@ try:
             GPIO.output(led2pin, GPIO.LOW)
             booting = False
             GPIO.cleanup()
-            GOING = subprocess.Popen(['python3 buttons.py'],
+            going = subprocess.Popen(['python3 buttons.py'],
                                   cwd=directory, shell=True)
             gone = True
         sleep(0.02)
 except:
+    """If the while loop returns an exception and 'buttons.py' has 
+    not been executed, this `except` statement attempts to rectify
+    the issue by calling 'buttons.py' itself.
+    """
     if not gone:
-        GOING = subprocess.Popen(['python3 buttons.py'],
+        going = subprocess.Popen(['python3 buttons.py'],
                               cwd=directory, shell=True)
