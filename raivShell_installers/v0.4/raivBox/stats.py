@@ -25,7 +25,6 @@
 # Portions copyright (c) 2022 RAIV - Jack Tipper
 
 import time
-import os
 
 import Adafruit_SSD1306   # This is the driver chip for the Adafruit PiOLED
 
@@ -432,14 +431,12 @@ while powered_on:
     draw.text((x, top+16), str(MemUsage.decode('utf-8')), font=font, fill=255)
     
     # draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
-    cmd = "cat ~/Desktop/raivBox/flags/invol.txt"
     try:
-        InVol = int(subprocess.check_output(cmd, shell=True).decode('ascii'))
+        InVol = int(subprocess.check_output("cat ~/Desktop/raivBox/flags/invol.txt", shell=True).decode('ascii'))
     except:
         InVol = 0
-    cmd = "cat ~/Desktop/raivBox/flags/outvol.txt"
     try:
-        OutVol = int(subprocess.check_output(cmd, shell=True).decode('ascii'))
+        OutVol = int(subprocess.check_output("cat ~/Desktop/raivBox/flags/outvol.txt", shell=True).decode('ascii'))
     except:
         OutVol = 0
     if InVol > 99: InVol = '99'
@@ -459,8 +456,12 @@ while powered_on:
     disp.image(image)
     disp.display()
 
-    if os.path.exists("~/Desktop/raivBox/flags/shut.down"):
-        powered_on = False
+    try:
+        powered_on = bool(subprocess.check_output("cat ~/Desktop/raivBox/flags/state.txt", shell=True).decode('ascii'))
+    except:
+        powered_on = True
+
+    if not powered_on:
         draw.rectangle((0, 0, width, height), outline=0, fill=0)
         draw.text((x, top),    "                      ", font=font, fill=255)
         draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)

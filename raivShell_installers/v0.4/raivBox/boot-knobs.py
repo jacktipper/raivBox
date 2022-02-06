@@ -172,9 +172,9 @@ while powered_on:
     sd_cmd = shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3)
     if sd_cmd == True:
         powered_on = False
-        os.system("touch flags/shut.down")
+        os.system("echo '0' | sudo tee flags/state.txt")
         os.system("echo '255' | sudo tee /sys/devices/pwm-fan/target_pwm")
         os.system('python3 sd-leds.py')
         sleep(0.34)
-        os.remove("flags/shut.down")
+        os.system("echo '1' | sudo tee flags/state.txt")
         os.system('sudo shutdown now')
