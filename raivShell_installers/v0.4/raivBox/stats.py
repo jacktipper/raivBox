@@ -393,7 +393,8 @@ while booting:           # "1234567890123456789012"
     time.sleep(1.14)
     booting = False
 
-while True:
+powered_on = True
+while powered_on:
 
     # Draw a black filled box to clear the image.
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
@@ -405,7 +406,7 @@ while True:
     Disk = subprocess.check_output(cmd, shell=True)
 
     # Show the current neural synthesizer model instead of GPU
-    Model = subprocess.check_output("cat ~/Desktop/raivBox/models/model.txt", shell=True).decode('ascii')[:-1]
+    Model = subprocess.check_output("cat ~/Desktop/raivBox/flags/model.txt", shell=True).decode('ascii')[:-1]
     draw.text((x, top), str(" Model: " + Model.upper()), font=font, fill=255)
 
     # Print the IP address
@@ -431,12 +432,12 @@ while True:
     draw.text((x, top+16), str(MemUsage.decode('utf-8')), font=font, fill=255)
     
     # draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
-    cmd = "cat ~/Desktop/raivBox/invol.txt"
+    cmd = "cat ~/Desktop/raivBox/flags/invol.txt"
     try:
         InVol = int(subprocess.check_output(cmd, shell=True).decode('ascii'))
     except:
         InVol = 0
-    cmd = "cat ~/Desktop/raivBox/outvol.txt"
+    cmd = "cat ~/Desktop/raivBox/flags/outvol.txt"
     try:
         OutVol = int(subprocess.check_output(cmd, shell=True).decode('ascii'))
     except:
@@ -458,14 +459,14 @@ while True:
     disp.image(image)
     disp.display()
 
-    if os.path.exists("~/Desktop/raivBox/shut.down"):
-        break
-
     # 1.0 = 1 second; The divisor is the desired updates (frames) per second
     time.sleep(0.16)
 
-if os.path.exists("~/Desktop/raivBox/shut.down"):
-    os.remove("~/Desktop/raivBox/shut.down")
+    if os.path.exists("~/Desktop/raivBox/flags/shut.down"):
+        powered_on = False
+
+if os.path.exists("~/Desktop/raivBox/flags/shut.down"):
+    os.remove("~/Desktop/raivBox/flags/shut.down")
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
     draw.text((x, top),    "                      ", font=font, fill=255)
     draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)

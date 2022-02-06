@@ -65,7 +65,6 @@ def shutdown_check(value, src):
 
 def shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3):
     if sd_cond_1 == True and sd_cond_2 == True and sd_cond_3 == True:
-        os.system("touch shut.down")
         sd_cmd = True
     else:
         sd_cmd = False
@@ -73,8 +72,8 @@ def shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3):
 
 
 # initialize input and output volume reports
-os.system("echo '01' | tee invol.txt")
-os.system("echo '01' | tee outvol.txt")
+os.system("echo '01' | tee flags/invol.txt")
+os.system("echo '01' | tee flags/outvol.txt")
 
 
 powered_on = True
@@ -117,7 +116,7 @@ while powered_on:
         set_in_vol_cmd = 'pactl set-source-volume 1 {}%' \
             .format(set_in_vol)
         os.system(set_in_vol_cmd)
-        os.system("echo '{}' | tee invol.txt".format(int(set_in_vol)))
+        os.system("echo '{}' | tee flags/invol.txt".format(int(set_in_vol)))
 
         # save the pot reading for the next loop
         in_last_read = trim_input
@@ -133,7 +132,7 @@ while powered_on:
         set_out_vol_cmd = 'pactl set-sink-volume 0 {}%' \
             .format(set_out_vol)
         os.system(set_out_vol_cmd)
-        os.system("echo '{}' | tee outvol.txt".format(int(set_out_vol)))
+        os.system("echo '{}' | tee flags/outvol.txt".format(int(set_out_vol)))
 
         # save the pot reading for the next loop
         out_last_read = trim_output
@@ -159,7 +158,7 @@ while powered_on:
         else:
             model = model_bank[4]
         if model != prev_model:
-            os.system("echo '{}' | sudo tee 'models/model.txt'" .format(model))
+            os.system("echo '{}' | sudo tee 'flags/model.txt'" .format(model))
         prev_model = model
 
         # save the pot reading for the next loop
@@ -173,6 +172,7 @@ while powered_on:
     sd_cmd = shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3)
     if sd_cmd == True:
         powered_on = False
+        os.system("touch flags/shut.down")
         os.system("echo '255' | sudo tee /sys/devices/pwm-fan/target_pwm")
         os.system('python3 sd-leds.py')
         os.system('sudo shutdown now')
