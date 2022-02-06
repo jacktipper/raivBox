@@ -1,9 +1,22 @@
 #!/bin/bash
+# Copyright (c) 2022 RAIV. All Rights Reserved.
+#     assembled by Jack Tipper - tipper@nyu.edu
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-# RAIVSHELL for NVIDIA Jetson Nano 2GB - Deep Learning for Music - Installation Sequence v0.3
-#     assembled by Jack Tipper - tipper@nyu.edu - (c) 2022 RAIV - Apache License 2.0
-
-# First, put the enclosing folder on the Desktop, and then run the following line in terminal (without the #):
+# Instructions:
+# First, put the enclosing folder on the Desktop, and then run the 
+# following line in terminal (without the # at the beginning):
 # sudo chmod +x ~/Desktop/raivShell/raivShell.sh ; sudo ~/Desktop/raivShell/raivShell.sh
 
 clear ; echo '--Initialize RAIVSHELL Installation Sequence for NVIDIA Jetson Nano 2GB--' ; echo ; sleep 1 ; echo '*'
@@ -103,5 +116,3 @@ echo '    at the bottom of the menu.' ; sleep 1
 echo '    After that, make sure [*] spi1 (19,21,23,24,26) is selected.' ; sleep 1
 echo '    Then select "Back" at the bottom, save, and reboot.' ; sleep 1
 read -p "    When you are ready to proceed to these steps, please press [ENTER]." x ; sudo /opt/nvidia/jetson-io/jetson-io.py
-
-# End of Shell

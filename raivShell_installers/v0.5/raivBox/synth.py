@@ -14,25 +14,25 @@
 # limitations under the License.
 
 # Lint as: python3
-"""Set hyperparameters for the neural synthesizer before importing libraries."""
-
+"""Before importing libraries, set key hyperparameters for the neural synthesizer.
+This is placed here at the top for user convenience when customizing.
+"""
 RATE = 16000  # Hz
+VOICING_THRESHOLD = -125  # dB
+PITCH_SHIFT = -1  # Octaves up or down
+LOUDNESS = 5  # Loudness shift (similar to gain-staging; normalized anyway)
 INPUT_PATH = 'audio/input.wav'
 OUTPUT_PATH = 'audio/output.wav'
 
-VOICING_THRESHOLD = -125  # dB
-PITCH_SHIFT = -1  # Octaves up or down
-LOUDNESS = 5  # Loudness shift (normalized anyway)
-
-
-"""Import these first to fix the python environment and suppress warnings"""
+"""Import these first to fix the python environment and suppress warnings."""
 import os
 os.system('./init-py.sh')
 
 import warnings
-warnings.filterwarnings("ignore")
+warnings.filterwarnings('ignore')
 
-"""Import these to start the LED blink sequence before time-consuming imports"""
+
+"""Import to start the LED blink sequence before time-consuming imports."""
 import time
 import Jetson.GPIO as GPIO
 from multiprocessing import Process
@@ -56,6 +56,8 @@ def blinker():
 blink = Process(target=blinker)
 blink.start()
 
+
+"""Import heavy audio processing and deep learning libraries."""
 import gin
 import librosa
 import pickle
@@ -68,13 +70,17 @@ from tensorflow.python.ops.numpy_ops import np_config
 from datetime import datetime
 
 
-# Disable GPU (CUDA and TensorFlow need to be patched)
+"""Disable GPU inference (CUDA and TensorFlow need to be patched)."""
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
-# DDSP Helper Functions (extracted from official modules)
+"""Create DDSP Helper Functions (extracted from official modules).
+Changing these two hyperparameters is not recommended and may cause errors.
+"""
+LD_RANGE = 120.0  # dB
+USE_TF = False  # tensorflow or numpy?
 
-# from metrics.py
+
 def squeeze(input_vector):
     """Ensure vector only has one axis of dimensionality."""
     if input_vector.ndim > 1:
@@ -107,10 +113,6 @@ def tf_float32(x):
     else:
         return tf.convert_to_tensor(x, tf.float32)
 
-
-# from spectral_ops.py
-LD_RANGE = 120.0  # dB
-USE_TF = False  # tensorflow or numpy?
 
 def stft(audio, frame_size=2048, overlap=0.75, pad_end=True):
     """Differentiable stft in tensorflow, computed in batch."""
@@ -155,20 +157,20 @@ def stft_np(audio, frame_size=2048, overlap=0.75, pad_end=True):
 
 
 def power_to_db(power, ref_db=0.0, range_db=LD_RANGE, use_tf=USE_TF):
-  """Converts power from linear scale to decibels."""
-  # Choose library.
-  maximum = tf.maximum if use_tf else np.maximum
-  log_base10 = log10 if use_tf else np.log10
+    """Converts power from linear scale to decibels."""
+    # Choose library.
+    maximum = tf.maximum if use_tf else np.maximum
+    log_base10 = log10 if use_tf else np.log10
 
-  # Convert to decibels.
-  pmin = 10**-(range_db / 10.0)
-  power = maximum(pmin, power)
-  db = 10.0 * log_base10(power)
+    # Convert to decibels.
+    pmin = 10**-(range_db / 10.0)
+    power = maximum(pmin, power)
+    db = 10.0 * log_base10(power)
 
-  # Set dynamic range.
-  db -= ref_db
-  db = maximum(db, -range_db)
-  return db
+    # Set dynamic range.
+    db -= ref_db
+    db = maximum(db, -range_db)
+    return db
 
 
 def compute_loudness(audio, # this function has been updated :)
@@ -183,17 +185,17 @@ def compute_loudness(audio, # this function has been updated :)
     Function is differentiable if use_tf=True.
     Args:
         audio: Numpy ndarray or tensor. Shape [batch_size, audio_length] or
-        [batch_size,].
+            [batch_size,].
         sample_rate: Audio sample rate in Hz.
         frame_rate: Rate of loudness frames in Hz.
         n_fft: Fft window size.
         range_db: Sets the dynamic range of loudness in decibles. The minimum
-        loudness (per a frequency bin) corresponds to -range_db.
+            loudness (per a frequency bin) corresponds to -range_db.
         ref_db: Sets the reference maximum perceptual loudness as given by
-        (A_weighting + 10 * log10(abs(stft(audio))**2.0). The old (<v2.0.0)
-        default value corresponded to white noise with amplitude=1.0 and
+            (A_weighting + 10 * log10(abs(stft(audio))**2.0). The old (<v2.0.0)
+            default value corresponded to white noise with amplitude=1.0 and
         n_fft=2048. With v2.0.0 it was set to 0.0 to be more consistent with power
-        calculations that have a natural scale for 0 dB being amplitude=1.0.
+            calculations that have a natural scale for 0 dB being amplitude=1.0.
         use_tf: Make function differentiable by using tensorflow.
         pad_end: Add zero padding at end of audio (like `same` convolution).
     Returns:
@@ -310,7 +312,7 @@ def pad_or_trim_to_expected_length(vector,
         expected_len: Expected length of vector.
         pad_value: Value to pad at end of vector.
         len_tolerance: Tolerance of difference between original and desired vector
-          length.
+            length.
         use_tf: Make function differentiable by using tensorflow.
     Returns:
         vector: Vector with corrected length.
@@ -370,13 +372,13 @@ def fit_quantile_transform(loudness_db, mask_on, inv_quantile=None):
 
     Optionally, performs the inverse transformation given a pre-fitted transform.
     Args:
-      loudness_db: Decibels, shape [batch, time]
-      mask_on: A binary mask for when a note is present, shape [batch, time].
-      inv_quantile: Optional pretrained QuantileTransformer to perform the inverse
-        transformation.
+        loudness_db: Decibels, shape [batch, time]
+        mask_on: A binary mask for when a note is present, shape [batch, time].
+        inv_quantile: Optional pretrained QuantileTransformer to perform the inverse
+            transformation.
 
     Returns:
-      Trained quantile transform. Also returns the renormalized loudnesses if
+        Trained quantile transform. Also returns the renormalized loudnesses if
         inv_quantile is provided.
     """
     quantile_transform = QuantileTransformer()
@@ -410,18 +412,18 @@ class QuantileTransformer:
         """Constructor.
 
         Args:
-          n_quantiles: int, default=1000 or n_samples Number of quantiles to be
-            computed. It corresponds to the number of landmarks used to discretize
-            the cumulative distribution function. If n_quantiles is larger than the
-            number of samples, n_quantiles is set to the number of samples as a
-            larger number of quantiles does not give a better approximation of the
-            cumulative distribution function estimator.
-          output_distribution: {'uniform', 'normal'}, default='uniform' Marginal
-            distribution for the transformed data. The choices are 'uniform'
-            (default) or 'normal'.
-          subsample: int, default=1e5 Maximum number of samples used to estimate
-            the quantiles for computational efficiency. Note that the subsampling
-            procedure may differ for value-identical sparse and dense matrices.
+            n_quantiles: int, default=1000 or n_samples Number of quantiles to be
+                computed. It corresponds to the number of landmarks used to discretize
+                the cumulative distribution function. If n_quantiles is larger than the
+                number of samples, n_quantiles is set to the number of samples as a
+                larger number of quantiles does not give a better approximation of the
+                cumulative distribution function estimator.
+            output_distribution: {'uniform', 'normal'}, default='uniform' Marginal
+                distribution for the transformed data. The choices are 'uniform'
+                (default) or 'normal'.
+            subsample: int, default=1e5 Maximum number of samples used to estimate
+                the quantiles for computational efficiency. Note that the subsampling
+                procedure may differ for value-identical sparse and dense matrices.
         """
         self.n_quantiles = n_quantiles
         self.output_distribution = output_distribution
@@ -432,9 +434,9 @@ class QuantileTransformer:
         """Compute percentiles for dense matrices.
 
         Args:
-          x: ndarray of shape (n_samples, n_features)
-            The data used to scale along the features axis.
-          random_state: Numpy random number generator.
+            x: ndarray of shape (n_samples, n_features)
+                The data used to scale along the features axis.
+            random_state: Numpy random number generator.
         """
         n_samples, _ = x.shape
         references = self.references_ * 100
@@ -459,15 +461,15 @@ class QuantileTransformer:
         Parameters
         ----------
         Args:
-          x: {array-like, sparse matrix} of shape (n_samples, n_features)
-            The data used to scale along the features axis. If a sparse
-            matrix is provided, it will be converted into a sparse
-            ``csc_matrix``. Additionally, the sparse matrix needs to be
-            nonnegative if `ignore_implicit_zeros` is False.
+            x: {array-like, sparse matrix} of shape (n_samples, n_features)
+                The data used to scale along the features axis. If a sparse
+                matrix is provided, it will be converted into a sparse
+                ``csc_matrix``. Additionally, the sparse matrix needs to be
+                nonnegative if `ignore_implicit_zeros` is False.
 
         Returns:
-          self: object
-             Fitted transformer.
+            self: object
+                Fitted transformer.
         """
         if self.n_quantiles <= 0:
             raise ValueError("Invalid value for 'n_quantiles': %d. "
@@ -514,13 +516,13 @@ class QuantileTransformer:
         isfinite_mask = ~np.isnan(x_col)
         x_col_finite = x_col[isfinite_mask]
         if not inverse:
-            # Interpolate in one direction and in the other and take the
-            # mean. This is in case of repeated values in the features
-            # and hence repeated quantiles
-            #
-            # If we don't do this, only one extreme of the duplicated is
-            # used (the upper when we do ascending, and the
-            # lower for descending). We take the mean of these two
+            """Interpolate in one direction and in the other and take the
+            mean. This is in case of repeated values in the features
+            and hence repeated quantiles
+            
+            If we don't do this, only one extreme of the duplicated is
+            used (the upper when we do ascending, and the
+            lower for descending). We take the mean of these two"""
             x_col[isfinite_mask] = .5 * (
                 np.interp(x_col_finite, quantiles, self.references_) -
                 np.interp(-x_col_finite, -quantiles[::-1], -self.references_[::-1]))
@@ -535,15 +537,15 @@ class QuantileTransformer:
             with np.errstate(invalid='ignore'):  # hide NaN comparison warnings
                 if output_distribution == 'normal':
                     x_col = stats.norm.ppf(x_col)
-                    # find the value to clip the data to avoid mapping to
-                    # infinity. Clip such that the inverse transform will be
-                    # consistent
+                    """find the value to clip the data to avoid mapping to
+                    infinity. Clip such that the inverse transform will be
+                    consistent"""
                     clip_min = stats.norm.ppf(bounds_threshold - np.spacing(1))
                     clip_max = stats.norm.ppf(
                         1 - (bounds_threshold - np.spacing(1)))
                     x_col = np.clip(x_col, clip_min, clip_max)
-                # else output distribution is uniform and the ppf is the
-                # identity function so we let x_col unchanged
+                """else output distribution is uniform and the ppf is the
+                identity function so we let x_col unchanged"""
 
         return x_col
 
@@ -551,15 +553,15 @@ class QuantileTransformer:
         """Forward and inverse transform.
 
         Args:
-          x : ndarray of shape (n_samples, n_features)
-            The data used to scale along the features axis.
-          inverse : bool, default=False
-            If False, apply forward transform. If True, apply
-            inverse transform.
+            x: ndarray of shape (n_samples, n_features)
+                The data used to scale along the features axis.
+            inverse : bool, default=False
+                If False, apply forward transform. If True, apply
+                inverse transform.
 
         Returns:
-          x : ndarray of shape (n_samples, n_features)
-            Projected data
+            x: ndarray of shape (n_samples, n_features)
+                Projected data
         """
         x = np.array(x)  # Explicit copy.
         for feature_idx in range(x.shape[1]):
@@ -580,7 +582,7 @@ class QuantileTransformer:
         return self.fit(x).transform(x)
 
 
-# Helper functions
+"""Additional helper functions from the Timbre Transfer Colab Demo."""
 def shift_ld(audio_features, ld_shift=0.0):
     """Shift loudness by a number of ocatves."""
     audio_features['loudness_db'] += ld_shift
@@ -607,18 +609,29 @@ def smooth(x, filter_size=3):
     return y.numpy()
 
 
+"""End the blinking process now that all dependencies are loaded."""
 blink.terminate()
 blink = None
 GPIO.output(led0pin, GPIO.HIGH)
 ready = 'flags/read.y'
 
+
+"""Use `try:` to open the core audio processing while loop.
+
+This will catch and exceptions and proceed to on to `finally:`,
+which will automatically save the generated audio files to the
+dedicated 'raivBox/audio/archive/' directory.
+"""
 try:
     while True:
+        """The `ready` flag is identified by the existence of 'flags/read.y'."""
         if os.path.exists(ready):
 
+            # Restart the blink sequence child process.
             blink = Process(target=blinker)
             blink.start()
             
+
             # Audio Feature Extraction
             fs = RATE
             x, fs = librosa.load(INPUT_PATH, sr=fs, mono=True)
@@ -647,12 +660,14 @@ try:
                 np.float32)
 
 
-            # Load a model
+            """Import a pretrained neural timbre model based on hardware input."""
+            # Import a model
             model_selection = open('flags/model.txt', 'r')
             MODEL = model_selection.read()[:-1]
             print('Model Loaded:', MODEL)
             model_dir = 'models/{}'.format(MODEL)
             gin_file = os.path.join(model_dir, 'operative_config-0.gin')
+
 
             # Load the dataset statistics.
             DATASET_STATS = None
@@ -664,9 +679,11 @@ try:
             except Exception as err:
                 print('Loading dataset statistics from pickle failed: {}.'.format(err))
 
+
             # Parse gin config,
             with gin.unlock_config():
                 gin.parse_config_file(gin_file, skip_unknown=True)
+
 
             # Ensure dimensions and sampling rates are equal
             time_steps_train = gin.query_parameter('F0LoudnessPreprocessor.time_steps')
@@ -694,8 +711,7 @@ try:
             audio_features['audio'] = audio_features['audio'][:n_samples]
 
 
-            # Modify conditioning
-
+            """Modify the audio feature conditioning parameters."""
             # Note Detection (leave this at 1.0 for most cases)
             threshold = 1  # min: 0.0, max:2.0, step:0.01
 
@@ -760,7 +776,7 @@ try:
             af = audio_features if audio_features_mod is None else audio_features_mod
 
 
-            # Load the model
+            """Load the neural timbre model into the Autoencoder for inference."""
             model = Autoencoder()
             model.load_weights('models/{}/model_data/'.format(MODEL))
 
@@ -768,10 +784,14 @@ try:
             # Run inference
             outputs = model(af, training=False)
 
+
+            """Convert the neural outputs into audio data."""
             audio_gen = model.get_audio_from_outputs(outputs)
             audio_gen = audio_gen.numpy()[0]
             audio_gen = audio_gen/np.max(audio_gen)
 
+
+            """Save any previous audio outputs to the archive before overwriting."""
             dest = str(datetime.now())[0:19]
             if os.path.exists(OUTPUT_PATH):
                 os.rename(OUTPUT_PATH, str('audio/archive/out_' + dest + '.wav'))
@@ -779,19 +799,28 @@ try:
             sf.write(OUTPUT_PATH, audio_gen, fs)
             print('\n    Output Successfully Synthesized\n')
 
+
+            # End blink sequence
             blink.terminate()
             blink = None
             GPIO.output(led0pin, GPIO.HIGH)
 
+
+            """Clear caches, archive the input audio, and deactivate the `ready` flag."""
             model_selection.flush() # clear open() cache
             model_selection.close()
             os.rename(INPUT_PATH, str('audio/archive/in_' + dest + '.wav'))
             os.remove(ready)
         
-        # set the status check interval for the while loop (responsivity)
+
+        """Set the status check interval for the while loop (responsivity)."""
         time.sleep(0.02)
 
 finally:
+    """If the core audio processing loop is aborted for any reason,
+    re-initialize the workspace in the 'raivBox/audio' and 'raivBox/flags'
+    directories and save any remaining audio files to the archive. 
+    """
     if os.path.exists(ready):
         os.remove(ready)
     dest = str(datetime.now())[0:19]
