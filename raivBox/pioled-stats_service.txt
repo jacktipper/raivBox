@@ -1,0 +1,12 @@
+[Unit]
+Description=PiOLED stats display service
+
+[Service]
+Type=simple
+User=rb
+WorkingDirectory=/home/rb/Desktop/raivBox
+ExecStart=/bin/sh -c "python3 stats.py"
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

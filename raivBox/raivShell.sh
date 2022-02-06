@@ -86,20 +86,19 @@ sudo -H pip3 install adafruit-circuitpython-mcp3xxx Adafruit-Blinka
 cd ../ ; cd raivBox ; sudo chmod +x init-spi.sh ; sudo chmod +x init-pa.sh ; sudo chmod +x init-py.sh ; clear
 
 echo '--Creating OLED Status Display Service--' ; echo ; echo ; sleep 2
-git clone https://github.com/JetsonHacksNano/installPiOLED
-cd installPiOLED; ./installPiOLED.sh; ./createService.sh
-sudo scp ~/Desktop/raivBox/stats.py /usr/local/lib/python3.6/dist-packages/pioled
-cd ~ ; sudo rm -rf installPiOLED ; sudo rm ~/Desktop/raivBox/stats.py
-sudo systemctl enable pioled_stats ; sudo systemctl start pioled_stats ; clear
+sudo touch /etc/systemd/system/pioled-stats.service
+sudo cat ~/Desktop/raivBox/pioled-stats_service.txt > /etc/systemd/system/pioled-stats.service
+sudo chmod +x /etc/systemd/system/pioled-stats.service
+sudo systemctl enable pioled-stats ; sudo systemctl start pioled-stats.service ; clear
 
 echo '--Creating Analog Control systemd Modules--' ; echo ; echo ; sleep 2
 sudo touch /etc/systemd/user/boot-leds.service
 sudo cat ~/Desktop/raivBox/boot-leds_service.txt > /etc/systemd/user/boot-leds.service
-sudo chmod +x /etc/systemd/user/boot-leds.service ; 
+sudo chmod +x /etc/systemd/user/boot-leds.service
 systemctl --user enable boot-leds ; systemctl --user start boot-leds ; clear
 sudo touch /etc/systemd/system/boot-knobs.service
 sudo cat ~/Desktop/raivBox/boot-knobs_service.txt > /etc/systemd/system/boot-knobs.service
-sudo chmod +x /etc/systemd/system/boot-knobs.service ; 
+sudo chmod +x /etc/systemd/system/boot-knobs.service
 sudo systemctl enable boot-knobs ; sudo systemctl start boot-knobs ; clear
 
 echo '--Final Housekeeping--' ; echo ; sleep 2

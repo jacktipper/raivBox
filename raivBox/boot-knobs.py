@@ -82,6 +82,7 @@ def remap_range(value, left_min, left_max, right_min, right_max):
     return int(right_min + (valueScaled * right_span))
 
 
+"""Initialize shutdown condition and command variables."""
 sd_cond_1 = False
 sd_cond_2 = False
 sd_cond_3 = False
@@ -89,11 +90,13 @@ sd_cmd = False
 
 
 def shutdown_check(value, src):
+    """Check if volume knobs are both below a set value (5%)."""
     if src == 'vol':
         if value < 5:
             condition = True
         else:
             condition = False
+    """Check if the model select knob is also below a set value (5%)."""
     if src == 'mod':
         if value < 5:
             condition = True
@@ -103,6 +106,8 @@ def shutdown_check(value, src):
 
 
 def shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3):
+    """If all shutdown conditions are simultaneously met, return the
+    shut down command to commence the shutdown sequence."""
     if sd_cond_1 == True and sd_cond_2 == True and sd_cond_3 == True:
         sd_cmd = True
     else:
@@ -184,7 +189,7 @@ while powered_on:
 
         # Set the neural synthesizer model
         if set_model < 2:
-            model = 'power down'
+            model = 'shutdown'
         elif set_model <= 20:
             model = model_bank[0]
         elif set_model <= 40:

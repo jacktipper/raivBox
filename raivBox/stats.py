@@ -107,11 +107,11 @@ draw = ImageDraw.Draw(image)
 # Draw a black filled box to clear the image.
 draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-# Draw some shapes.
-# First define some constants to allow easy resizing of shapes.
+# Define some constants to allow easy resizing of shapes.
 padding = -2
 top = padding
 bottom = height-padding
+
 # Move left to right keeping track of the current x position for drawing shapes.
 x = 0
 
@@ -464,17 +464,15 @@ while powered_on:
     # Draw a black filled box to clear the image.
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-
     # Extract the current neural synthesizer model from the model flag file
     Model = subprocess.check_output("cat ~/Desktop/raivBox/flags/model.txt", shell=True).decode('ascii')[:-1]
     
-    if Model == 'power down':
+    if Model == 'shutdown':
         """When the model selection knob is set to its lowest setting, a message with
         system shut down instructions will appear on the display screen.
         """
         draw.text((x, top),    "  To SHUT DOWN, set  ", font=font, fill=255)
         draw.text((x, top+8),  "  all knobs to zero  ", font=font, fill=255)
-        draw.text((x, top+16), "  *   *   *   *   *  ", font=font, fill=255)
 
         try:
             InVol = int(subprocess.check_output("cat ~/Desktop/raivBox/flags/invol.txt", shell=True).decode('ascii'))
