@@ -619,7 +619,7 @@ ready = 'flags/read.y'
 
 """Use `try:` to open the core audio processing while loop.
 
-This will catch and exceptions and proceed to on to `finally:`,
+This will catch exceptions and proceed to on to `finally:`,
 which will automatically save the generated audio files to the
 dedicated 'raivBox/audio/archive/' directory.
 """
