@@ -631,7 +631,8 @@ try:
 
 
             # Load a model
-            MODEL = open('models/model.txt').read()[0:-1]
+            model_selection = open('models/model.txt', 'r')
+            MODEL = model_selection.read()[:-1]
             print('Model Loaded:', MODEL)
             model_dir = 'models/{}'.format(MODEL)
             gin_file = os.path.join(model_dir, 'operative_config-0.gin')
@@ -765,6 +766,8 @@ try:
             blink = None
             GPIO.output(led0pin, GPIO.HIGH)
 
+            model_selection.flush() # clear open() cache
+            model_selection.close()
             os.rename(INPUT_PATH, str('audio/archive/in_' + dest + '.wav'))
             os.remove(ready)
         

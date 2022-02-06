@@ -45,13 +45,14 @@ def get_ip_address(interface):
     cmd = "ifconfig %s | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'" % interface
     return subprocess.check_output(cmd, shell=True).decode('ascii')[:-1]
 
-# Return a string representing the percentage of CPU in use
+# Return a float representing the percentage of CPU in use
 
 
 def get_cpu_usage():
     # Shell scripts for system monitoring from here : https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-    cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
-    CPU = subprocess.check_output(cmd, shell=True).decode('ascii')[:-1]
+    cmd = "awk '{u=$2+$4; t=$2+$4+$5; if (NR==1){u1=u; t1=t;} else print ($2+$4-u1) * 100 / (t-t1) \"%\"; }' \
+           <(grep 'cpu ' /proc/stat) <(sleep 0.16;grep 'cpu ' /proc/stat)"
+    CPU = float(subprocess.check_output(cmd, shell=True).decode('ascii')[:-3])
     return CPU
 
 # Return a float representing the percentage of GPU in use.
@@ -102,6 +103,18 @@ font = ImageFont.load_default()
 
 booting = True
 while booting:           # "1234567890123456789012"
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    draw.text((x, top),    "                      ", font=font, fill=255)
+    draw.text((x, top+8),  "     R A I V B O X    ", font=font, fill=255)
+    draw.text((x, top+16), "                      ", font=font, fill=255)
+    draw.text((x, top+25), "                      ", font=font, fill=255)
+    disp.image(image)
+    disp.display()
+    time.sleep(1.14)
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    disp.image(image)
+    disp.display()
+    time.sleep(0.06)
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
     draw.text((x, top),    "x                     ", font=font, fill=255)
     draw.text((x, top+8),  "                      ", font=font, fill=255)
@@ -351,37 +364,69 @@ while booting:           # "1234567890123456789012"
     disp.display()
     time.sleep(0.06)
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    disp.image(image)
+    disp.display()
+    time.sleep(0.06)
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
     draw.text((x, top),    "     R A I V B O X    ", font=font, fill=255)
     draw.text((x, top+8),  "                      ", font=font, fill=255)
     draw.text((x, top+16), "                      ", font=font, fill=255)
     draw.text((x, top+25), "                      ", font=font, fill=255)
     disp.image(image)
     disp.display()
-    time.sleep(0.24)
+    time.sleep(0.06)
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
-    draw.text((x, top),    "                      ", font=font, fill=255)
-    draw.text((x, top+8),  "    R A I V B O X     ", font=font, fill=255)
+    draw.text((x, top),    "     R A I V B O X    ", font=font, fill=255)
+    draw.text((x, top+8),  "     R A I V B O X    ", font=font, fill=255)
     draw.text((x, top+16), "                      ", font=font, fill=255)
     draw.text((x, top+25), "                      ", font=font, fill=255)
     disp.image(image)
     disp.display()
-    time.sleep(0.24)
+    time.sleep(0.06)
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
-    draw.text((x, top),    "                      ", font=font, fill=255)
-    draw.text((x, top+8),  "                      ", font=font, fill=255)
+    draw.text((x, top),    "     R A I V B O X    ", font=font, fill=255)
+    draw.text((x, top+8),  "     R A I V B O X    ", font=font, fill=255)
     draw.text((x, top+16), "     R A I V B O X    ", font=font, fill=255)
     draw.text((x, top+25), "                      ", font=font, fill=255)
     disp.image(image)
     disp.display()
-    time.sleep(0.24)
+    time.sleep(0.06)
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    draw.text((x, top),    "     R A I V B O X    ", font=font, fill=255)
+    draw.text((x, top+8),  "     R A I V B O X    ", font=font, fill=255)
+    draw.text((x, top+16), "     R A I V B O X    ", font=font, fill=255)
+    draw.text((x, top+25), "     R A I V B O X    ", font=font, fill=255)
+    disp.image(image)
+    disp.display()
+    time.sleep(0.06)
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    draw.text((x, top),    "                      ", font=font, fill=255)
+    draw.text((x, top+8),  "     R A I V B O X    ", font=font, fill=255)
+    draw.text((x, top+16), "     R A I V B O X    ", font=font, fill=255)
+    draw.text((x, top+25), "     R A I V B O X    ", font=font, fill=255)
+    disp.image(image)
+    disp.display()
+    time.sleep(0.06)
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    draw.text((x, top),    "                      ", font=font, fill=255)
+    draw.text((x, top+8),  "                      ", font=font, fill=255)
+    draw.text((x, top+16), "     R A I V B O X    ", font=font, fill=255)
+    draw.text((x, top+25), "     R A I V B O X    ", font=font, fill=255)
+    disp.image(image)
+    disp.display()
+    time.sleep(0.06)
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
     draw.text((x, top),    "                      ", font=font, fill=255)
     draw.text((x, top+8),  "                      ", font=font, fill=255)
     draw.text((x, top+16), "                      ", font=font, fill=255)
-    draw.text((x, top+25), "    R A I V B O X     ", font=font, fill=255)
+    draw.text((x, top+25), "     R A I V B O X    ", font=font, fill=255)
     disp.image(image)
     disp.display()
-    time.sleep(0.24)
+    time.sleep(0.06)
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    disp.image(image)
+    disp.display()
+    time.sleep(0.06)
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
     draw.text((x, top),    "                      ", font=font, fill=255)
     draw.text((x, top+8),  "          by          ", font=font, fill=255)
@@ -410,22 +455,35 @@ while powered_on:
 
     # Print the IP address
     # Two examples here, wired and wireless
-    draw.text((x, top+8), " IP:   " + str(get_ip_address('wlan0')),  font=font, fill=255)
-
-    # Alternate solution: Draw the GPU usage as text
-    # draw.text((x, top+8),     "GPU:  " +"{:3.1f}".format(GPU)+" %", font=font, fill=255)
-    # We draw the GPU usage as a bar graph
-    string_width, string_height = font.getsize(" GPU:   ")
-    # Figure out the width of the bar
-    full_bar_width = width-(x+string_width)-1
-    gpu_usage = get_gpu_usage()
-    # Avoid divide by zero ...
-    # if gpu_usage == 0.0:
-    #     gpu_usage = 0.001
-    # draw_bar_width = int(full_bar_width*(gpu_usage/100))
-    # draw.text((x, top+8),     "GPU:  ", font=font, fill=255)
-    # draw.rectangle((x+string_width, top+12, x+string_width +
-    #                 draw_bar_width, top+14), outline=1, fill=1)
+    if str(get_ip_address('wlan0')) is not 'None':
+        draw.text((x, top+8), " IP:   " + str(get_ip_address('wlan0')),  font=font, fill=255)
+    else:
+        if True:
+            # Draw the GPU usage as a bar graph
+            string_width, string_height = font.getsize(" GPU:  ")
+            # Figure out the width of the bar
+            full_bar_width = width-(x+string_width)-1
+            gpu_usage = get_gpu_usage()
+            # Avoid divide by zero
+            if gpu_usage == 0.0:
+                gpu_usage = 0.001
+            draw_bar_width = int(full_bar_width*(gpu_usage/100))
+            draw.text((x, top+8), " GPU:  ", font=font, fill=255)
+            draw.rectangle((x+string_width, top+12, x+string_width +
+                            draw_bar_width, top+14), outline=1, fill=1)
+        else:
+            # Draw the CPU usage as a bar graph
+            string_width, string_height = font.getsize(" CPU:  ")
+            # Figure out the width of the bar
+            full_bar_width = width-(x+string_width)-1
+            cpu_usage = get_cpu_usage()
+            # Avoid divide by zero
+            if cpu_usage == 0.0:
+                cpu_usage = 0.001
+            draw_bar_width = int(full_bar_width*(cpu_usage/100))
+            draw.text((x, top+8), " CPU:  ", font=font, fill=255)
+            draw.rectangle((x+string_width, top+12, x+string_width +
+                            draw_bar_width, top+14), outline=1, fill=1)
 
     # Show the memory Usage
     draw.text((x, top+16), str(MemUsage.decode('utf-8')), font=font, fill=255)
@@ -444,7 +502,7 @@ while powered_on:
     if InVol < 10: InVol = ' {}'.format(InVol)
     if OutVol < 10: OutVol = ' {}'.format(OutVol)
 
-    if int(InVol) < 26 or int(OutVol) < 26:
+    if int(InVol) <= 50 or int(OutVol) <= 50:
         # Show the volume levels
         draw.text((x, top+25), " IN: " + str(InVol) + "%    OUT: " + str(OutVol) + "%", font=font, fill=255)   
     else:
@@ -464,13 +522,69 @@ while powered_on:
     if not powered_on:
         while not powered_on:
                 draw.rectangle((0, 0, width, height), outline=0, fill=0)
+                draw.text((x, top),    "            *         ", font=font, fill=255)
+                draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
+                draw.text((x, top+16), "         DOWN         ", font=font, fill=255)
+                draw.text((x, top+25), "         *            ", font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                time.sleep(0.24)
+                draw.rectangle((0, 0, width, height), outline=0, fill=0)
+                draw.text((x, top),    "           *          ", font=font, fill=255)
+                draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
+                draw.text((x, top+16), "         DOWN         ", font=font, fill=255)
+                draw.text((x, top+25), "          *           ", font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                time.sleep(0.24)
+                draw.rectangle((0, 0, width, height), outline=0, fill=0)
+                draw.text((x, top),    "          *           ", font=font, fill=255)
+                draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
+                draw.text((x, top+16), "         DOWN         ", font=font, fill=255)
+                draw.text((x, top+25), "           *          ", font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                time.sleep(0.24)
+                draw.rectangle((0, 0, width, height), outline=0, fill=0)
+                draw.text((x, top),    "         *            ", font=font, fill=255)
+                draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
+                draw.text((x, top+16), "         DOWN         ", font=font, fill=255)
+                draw.text((x, top+25), "            *         ", font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                time.sleep(0.24)
+                draw.rectangle((0, 0, width, height), outline=0, fill=0)
+                draw.text((x, top),    "          *           ", font=font, fill=255)
+                draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
+                draw.text((x, top+16), "         DOWN         ", font=font, fill=255)
+                draw.text((x, top+25), "           *          ", font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                time.sleep(0.24)
+                draw.rectangle((0, 0, width, height), outline=0, fill=0)
+                draw.text((x, top),    "           *          ", font=font, fill=255)
+                draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
+                draw.text((x, top+16), "         DOWN         ", font=font, fill=255)
+                draw.text((x, top+25), "          *           ", font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                time.sleep(0.24)
+                draw.rectangle((0, 0, width, height), outline=0, fill=0)
                 draw.text((x, top),    "                      ", font=font, fill=255)
                 draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
                 draw.text((x, top+16), "         DOWN         ", font=font, fill=255)
                 draw.text((x, top+25), "                      ", font=font, fill=255)
                 disp.image(image)
                 disp.display()
-                time.sleep(3)
+                time.sleep(0.36)
+                draw.rectangle((0, 0, width, height), outline=0, fill=0)
+                draw.text((x, top),    "                      ", font=font, fill=255)
+                draw.text((x, top+8),  "        (^_^)_/       ", font=font, fill=255)
+                draw.text((x, top+16), "                      ", font=font, fill=255)
+                draw.text((x, top+25), "                      ", font=font, fill=255)
+                disp.image(image)
+                disp.display()
+                time.sleep(9)
     else:
         # 1.0 = 1 second; The divisor is the desired updates (frames) per second
         time.sleep(0.16)
