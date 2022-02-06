@@ -101,7 +101,8 @@ try:
 except:
     """If the while loop returns an exception and 'buttons.py' has 
     not been executed, this `except` statement attempts to rectify
-    the issue by calling 'buttons.py' itself.
+    the issue by calling 'buttons.py' itself. Note: This `except`
+    statement doesn't work as intended yet.
     """
     if not gone:
         going = subprocess.Popen(['python3 buttons.py'],
