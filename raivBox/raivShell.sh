@@ -87,17 +87,17 @@ cd ../ ; cd raivBox ; sudo chmod +x init-spi.sh ; sudo chmod +x init-pa.sh ; sud
 
 echo '--Creating OLED Status Display Service--' ; echo ; echo ; sleep 2
 sudo touch /etc/systemd/system/pioled-stats.service
-sudo cat ~/Desktop/raivBox/pioled-stats_service.txt > /etc/systemd/system/pioled-stats.service
+sudo cat ~/Desktop/raivBox/services/pioled-stats_service.txt > /etc/systemd/system/pioled-stats.service
 sudo chmod +x /etc/systemd/system/pioled-stats.service
 sudo systemctl enable pioled-stats ; sudo systemctl start pioled-stats.service ; clear
 
 echo '--Creating Analog Control systemd Modules--' ; echo ; echo ; sleep 2
 sudo touch /etc/systemd/user/boot-leds.service
-sudo cat ~/Desktop/raivBox/boot-leds_service.txt > /etc/systemd/user/boot-leds.service
+sudo cat ~/Desktop/raivBox/services/boot-leds_service.txt > /etc/systemd/user/boot-leds.service
 sudo chmod +x /etc/systemd/user/boot-leds.service
 systemctl --user enable boot-leds ; systemctl --user start boot-leds ; clear
 sudo touch /etc/systemd/system/boot-knobs.service
-sudo cat ~/Desktop/raivBox/boot-knobs_service.txt > /etc/systemd/system/boot-knobs.service
+sudo cat ~/Desktop/raivBox/services/boot-knobs_service.txt > /etc/systemd/system/boot-knobs.service
 sudo chmod +x /etc/systemd/system/boot-knobs.service
 sudo systemctl enable boot-knobs ; sudo systemctl start boot-knobs ; clear
 
