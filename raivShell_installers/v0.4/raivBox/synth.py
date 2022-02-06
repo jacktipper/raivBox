@@ -631,7 +631,7 @@ try:
 
 
             # Load a model
-            model_selection = open('models/model.txt', 'r')
+            model_selection = open('flags/model.txt', 'r')
             MODEL = model_selection.read()[:-1]
             print('Model Loaded:', MODEL)
             model_dir = 'models/{}'.format(MODEL)
