@@ -459,19 +459,17 @@ while powered_on:
     disp.image(image)
     disp.display()
 
-    # 1.0 = 1 second; The divisor is the desired updates (frames) per second
-    time.sleep(0.16)
-
     if os.path.exists("~/Desktop/raivBox/flags/shut.down"):
         powered_on = False
-
-if not powered_on:
-    os.remove("~/Desktop/raivBox/flags/shut.down")
-    draw.rectangle((0, 0, width, height), outline=0, fill=0)
-    draw.text((x, top),    "                      ", font=font, fill=255)
-    draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
-    draw.text((x, top+16), "         DOWN         ", font=font, fill=255)
-    draw.text((x, top+25), "                      ", font=font, fill=255)
-    disp.image(image)
-    disp.display()
-    time.sleep(3)
+        os.remove("~/Desktop/raivBox/flags/shut.down")
+        draw.rectangle((0, 0, width, height), outline=0, fill=0)
+        draw.text((x, top),    "                      ", font=font, fill=255)
+        draw.text((x, top+8),  "       SHUTTING       ", font=font, fill=255)
+        draw.text((x, top+16), "         DOWN         ", font=font, fill=255)
+        draw.text((x, top+25), "                      ", font=font, fill=255)
+        disp.image(image)
+        disp.display()
+        # time.sleep(3)
+    else:
+        # 1.0 = 1 second; The divisor is the desired updates (frames) per second
+        time.sleep(0.16)

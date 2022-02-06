@@ -158,7 +158,7 @@ while powered_on:
         else:
             model = model_bank[4]
         if model != prev_model:
-            os.system("echo '{}' | sudo tee 'flags/model.txt'" .format(model))
+            os.system("echo '{}' | sudo tee flags/model.txt" .format(model))
         prev_model = model
 
         # save the pot reading for the next loop
