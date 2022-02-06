@@ -65,6 +65,7 @@ def get_ip_address(interface):
 
 
 def get_cpu_usage():
+    """Note: This CPU usage function doesn't work as intended yet."""
     # Shell scripts for system monitoring from here: 
     # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
     cmd = "awk '{u=$2+$4; t=$2+$4+$5; if (NR==1){u1=u; t1=t;} else print ($2+$4-u1) * 100 / (t-t1) \"%\"; }' \
@@ -463,78 +464,108 @@ while powered_on:
     # Draw a black filled box to clear the image.
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-    # Shell scripts for system monitoring from here: 
-    # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-    cmd = "free -m | awk 'NR==2{printf \" Mem:  %.0f%% %s/%sM \", $3*100/$2, $3,$2 }'"
-    MemUsage = subprocess.check_output(cmd, shell=True)
-    cmd = "df -h | awk '$NF==\"/\"{printf \" Disk: %s %d/%dGB \", $5, $3,$2 }'"
-    Disk = subprocess.check_output(cmd, shell=True)
 
-    # Show the current neural synthesizer model instead of GPU
+    # Extract the current neural synthesizer model from the model flag file
     Model = subprocess.check_output("cat ~/Desktop/raivBox/flags/model.txt", shell=True).decode('ascii')[:-1]
-    draw.text((x, top), str(" Model: " + Model.upper()), font=font, fill=255)
+    
+    if Model == 'power down':
+        """When the model selection knob is set to its lowest setting, a message with
+        system shut down instructions will appear on the display screen.
+        """
+        draw.text((x, top),    "  To SHUT DOWN, set  ", font=font, fill=255)
+        draw.text((x, top+8),  "  all knobs to zero  ", font=font, fill=255)
+        draw.text((x, top+16), "  *   *   *   *   *  ", font=font, fill=255)
 
-    # Print the IP address
-    # Two examples here, wired and wireless
-    if str(get_ip_address('wlan0')) is not 'None':
-        draw.text((x, top+8), " IP:   " + str(get_ip_address('wlan0')),  font=font, fill=255)
+        try:
+            InVol = int(subprocess.check_output("cat ~/Desktop/raivBox/flags/invol.txt", shell=True).decode('ascii'))
+        except:
+            InVol = 99
+        try:
+            OutVol = int(subprocess.check_output("cat ~/Desktop/raivBox/flags/outvol.txt", shell=True).decode('ascii'))
+        except:
+            OutVol = 99
+        if InVol > 99: InVol = '99'
+        if OutVol > 99: OutVol = '99'
+        if InVol < 10: InVol = ' {}'.format(InVol)
+        if OutVol < 10: OutVol = ' {}'.format(OutVol)
+
+        # Show the two other knob settings
+        draw.text((x, top+25), " IN: " + str(InVol) + "%    OUT: " + str(OutVol) + "%", font=font, fill=255)         
+
     else:
-        if True:
-            # Draw the GPU usage as a bar graph
-            string_width, string_height = font.getsize(" GPU:  ")
-            # Figure out the width of the bar
-            full_bar_width = width-(x+string_width)-1
-            gpu_usage = get_gpu_usage()
-            # Avoid divide by zero
-            if gpu_usage == 0.0:
-                gpu_usage = 0.001
-            draw_bar_width = int(full_bar_width*(gpu_usage/100))
-            draw.text((x, top+8), " GPU:  ", font=font, fill=255)
-            draw.rectangle((x+string_width, top+12, x+string_width +
-                            draw_bar_width, top+14), outline=1, fill=1)
+        # Display the current neural synthesizer model
+        draw.text((x, top), str(" Model: " + Model.upper()), font=font, fill=255)
+
+        # Print the IP address
+        # Two examples here, wired and wireless
+        if str(get_ip_address('wlan0')) is not 'None':
+            draw.text((x, top+8), " IP:   " + str(get_ip_address('wlan0')),  font=font, fill=255)
         else:
-            # Draw the CPU usage as a bar graph
-            string_width, string_height = font.getsize(" CPU:  ")
-            # Figure out the width of the bar
-            full_bar_width = width-(x+string_width)-1
-            cpu_usage = get_cpu_usage()
-            # Avoid divide by zero
-            if cpu_usage == 0.0:
-                cpu_usage = 0.001
-            draw_bar_width = int(full_bar_width*(cpu_usage/100))
-            draw.text((x, top+8), " CPU:  ", font=font, fill=255)
-            draw.rectangle((x+string_width, top+12, x+string_width +
-                            draw_bar_width, top+14), outline=1, fill=1)
-
-    # Show the memory usage.
-    draw.text((x, top+16), str(MemUsage.decode('utf-8')), font=font, fill=255)
-
-
-    """Extract the input and output volume settings from their respective flag files."""
-    try:
-        InVol = int(subprocess.check_output("cat ~/Desktop/raivBox/flags/invol.txt", shell=True).decode('ascii'))
-    except:
-        InVol = 0
-    try:
-        OutVol = int(subprocess.check_output("cat ~/Desktop/raivBox/flags/outvol.txt", shell=True).decode('ascii'))
-    except:
-        OutVol = 0
-    if InVol > 99: InVol = '99'
-    if OutVol > 99: OutVol = '99'
-    if InVol < 10: InVol = ' {}'.format(InVol)
-    if OutVol < 10: OutVol = ' {}'.format(OutVol)
+            if True:
+                # Draw the GPU usage as a bar graph
+                string_width, string_height = font.getsize(" GPU:  ")
+                # Figure out the width of the bar
+                full_bar_width = width-(x+string_width)-1
+                gpu_usage = get_gpu_usage()
+                # Avoid divide by zero
+                if gpu_usage == 0.0:
+                    gpu_usage = 0.001
+                draw_bar_width = int(full_bar_width*(gpu_usage/100))
+                draw.text((x, top+8), " GPU:  ", font=font, fill=255)
+                draw.rectangle((x+string_width, top+12, x+string_width +
+                                draw_bar_width, top+14), outline=1, fill=1)
+            else:
+                """Note: This CPU usage option doesn't work as intended yet."""
+                # Draw the CPU usage as a bar graph
+                string_width, string_height = font.getsize(" CPU:  ")
+                # Figure out the width of the bar
+                full_bar_width = width-(x+string_width)-1
+                cpu_usage = get_cpu_usage()
+                # Avoid divide by zero
+                if cpu_usage == 0.0:
+                    cpu_usage = 0.001
+                draw_bar_width = int(full_bar_width*(cpu_usage/100))
+                draw.text((x, top+8), " CPU:  ", font=font, fill=255)
+                draw.rectangle((x+string_width, top+12, x+string_width +
+                                draw_bar_width, top+14), outline=1, fill=1)
 
 
-    """When either volume level is below 50%, display both levels on the PiOLED screen.
-    This allows the user to see when recording/output levels are too low, and thus assists 
-    with hardware debugging.
-    """
-    if int(InVol) <= 50 or int(OutVol) <= 50:
-        # Show the volume levels.
-        draw.text((x, top+25), " IN: " + str(InVol) + "%    OUT: " + str(OutVol) + "%", font=font, fill=255)   
-    else:
-        # Show the amount of disk being used.
-        draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
+        # Shell scripts for system monitoring from here: 
+        # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
+        cmd = "free -m | awk 'NR==2{printf \" Mem:  %.0f%% %s/%sM \", $3*100/$2, $3,$2 }'"
+        MemUsage = subprocess.check_output(cmd, shell=True)
+        cmd = "df -h | awk '$NF==\"/\"{printf \" Disk: %s %d/%dGB \", $5, $3,$2 }'"
+        Disk = subprocess.check_output(cmd, shell=True)
+
+        # Show the memory usage.
+        draw.text((x, top+16), str(MemUsage.decode('utf-8')), font=font, fill=255)
+
+
+        """Extract the input and output volume settings from their respective flag files."""
+        try:
+            InVol = int(subprocess.check_output("cat ~/Desktop/raivBox/flags/invol.txt", shell=True).decode('ascii'))
+        except:
+            InVol = 0
+        try:
+            OutVol = int(subprocess.check_output("cat ~/Desktop/raivBox/flags/outvol.txt", shell=True).decode('ascii'))
+        except:
+            OutVol = 0
+        if InVol > 99: InVol = '99'
+        if OutVol > 99: OutVol = '99'
+        if InVol < 10: InVol = ' {}'.format(InVol)
+        if OutVol < 10: OutVol = ' {}'.format(OutVol)
+
+
+        """When either volume level is below 50%, display both levels on the PiOLED screen.
+        This allows the user to see when recording/output levels are too low, and thus assists 
+        with hardware debugging.
+        """
+        if int(InVol) <= 50 or int(OutVol) <= 50:
+            # Show the volume levels.
+            draw.text((x, top+25), " IN: " + str(InVol) + "%    OUT: " + str(OutVol) + "%", font=font, fill=255)   
+        else:
+            # Show the amount of disk being used.
+            draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
 
 
     """Display image by setting the SSD1306 image to the PIL image we have made, then calling display."""
