@@ -18,7 +18,7 @@ All of the additional python files in this repository facilitate hardware-softwa
 
 The `assets/` folder contains a few graphics, as well as the three .stl files neede to 3D-print the raivBox housing components.
 
-To replicate this project, you will need:
+#### To replicate this project, you will need:
 
 • 1x NVIDIA Jetson Nano 2GB Embedded Development Kit
 
@@ -30,7 +30,7 @@ To replicate this project, you will need:
 
 • 1x 3.5mm microphone (https://www.bhphotovideo.com/c/product/1632609-REG/boya_by_um4_3_5mm_mini_flexible_lavalier.html)
 
-For the optional housing and hardware control interface, you will also need:
+#### For the optional housing and hardware control interface, you will also need:
 
 • Access to a capable 3D-printer or 3D-printing service for the .stl files in the `assets/` folder
 
