@@ -42,11 +42,15 @@ The `assets/` folder contains a few graphics, as well as the three .stl files ne
 
 • 2x 2-pin 30mm arcade buttons (https://smile.amazon.com/gp/product/B005BZ421M/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1)
 
-• 3x 10kOhm potentiometers (https://smile.amazon.com/gp/product/B07B64MWRF/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1)
+• 3x 10kΩ potentiometers (https://smile.amazon.com/gp/product/B07B64MWRF/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1)
 
 • 3x standard 2-pin 5mm LEDs
 
 • 1x MCP-3008 ADC IC chip
+
+• 3x 220Ω resistors
+
+• 2x 1kΩ resistors
 
 
 ![raivBox product](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_product.jpeg)
