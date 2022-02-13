@@ -28,7 +28,7 @@ The `assets/` folder contains a few graphics, as well as the three .stl files ne
 
 • 1x compatible USB-C power supply (https://www.canakit.com/raspberry-pi-4-power-supply.html)
 
-• 1x USB audio DAC (https://www.sabrent.com/product/AU-EMCB/usb-aluminum-external-stereo-sound-adapter-black/)
+• 1x Sabrent USB audio adapter (https://www.sabrent.com/product/AU-EMCB/usb-aluminum-external-stereo-sound-adapter-black/)
 
 • 1x 3.5mm microphone (https://www.bhphotovideo.com/c/product/1632609-REG/boya_by_um4_3_5mm_mini_flexible_lavalier.html)
 
@@ -38,6 +38,8 @@ The `assets/` folder contains a few graphics, as well as the three .stl files ne
 • Access to a capable 3D-printer or 3D-printing service for the .stl files in the `assets/` folder
 
 • Custom PCB manufacturing for `assets/raivBox_pcb.zip`
+
+• 1x Adafruit PiOLED display (https://www.adafruit.com/product/3527)
 
 • 1x compatible fan with hardware (https://smile.amazon.com/dp/B07YFDCGQV/ref=cm_sw_em_r_mt_dp_BDKKRKYSQ2KYJ76BYARS)
 
@@ -53,5 +55,19 @@ The `assets/` folder contains a few graphics, as well as the three .stl files ne
 
 • 2x 1kΩ resistors
 
+• Plenty of M2.5 standoffs (https://smile.amazon.com/gp/product/B075K3QBMX/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1)
+
+• Plenty of insulated wire (~28 gauge)
+
+• Basic soldering tools and know-how
+
+• 40-pin stacking header kit for PCB attachment
+
+• 1x INIU USB-C power bank (https://smile.amazon.com/gp/product/B07CZDXDG8/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1)
+
+• 1x short USB-C male to USB-C male cable
+
+
+#
 
 ![raivBox product](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_product.jpeg)
