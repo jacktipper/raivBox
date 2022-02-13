@@ -38,7 +38,7 @@ The `assets/` folder contains a few graphics, as well as the three .stl files ne
 
 • Custom PCB manufacturing for `assets/raivBox_pcb.zip`
 
-• 1x compatible fan with attachment hardware (https://smile.amazon.com/dp/B07YFDCGQV/ref=cm_sw_em_r_mt_dp_BDKKRKYSQ2KYJ76BYARS)
+• 1x compatible fan with hardware (https://smile.amazon.com/dp/B07YFDCGQV/ref=cm_sw_em_r_mt_dp_BDKKRKYSQ2KYJ76BYARS)
 
 • 2x 2-pin 30mm arcade buttons (https://smile.amazon.com/gp/product/B005BZ421M/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1)
 
