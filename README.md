@@ -20,7 +20,7 @@ The `assets/` folder contains a few graphics, as well as the custom PCB .zip fil
 
 #
 
-### To replicate this project, you will need:
+### To replicate the basic functionality of this project, you will need:
 
 • 1x NVIDIA Jetson Nano 2GB Embedded Development Kit
 
