@@ -18,6 +18,7 @@ All of the additional python files in this repository facilitate hardware-softwa
 
 The `assets/` folder contains a few graphics, as well as the three .stl files neede to 3D-print the raivBox housing components.
 
+
 ### To replicate this project, you will need:
 
 • 1x NVIDIA Jetson Nano 2GB Embedded Development Kit
@@ -29,6 +30,7 @@ The `assets/` folder contains a few graphics, as well as the three .stl files ne
 • 1x USB audio DAC (https://www.sabrent.com/product/AU-EMCB/usb-aluminum-external-stereo-sound-adapter-black/)
 
 • 1x 3.5mm microphone (https://www.bhphotovideo.com/c/product/1632609-REG/boya_by_um4_3_5mm_mini_flexible_lavalier.html)
+
 
 ### For the optional housing and hardware control interface, you will also need:
 
@@ -45,5 +47,6 @@ The `assets/` folder contains a few graphics, as well as the three .stl files ne
 • 3x standard 2-pin 5mm LEDs
 
 • 1x MCP-3008 ADC IC chip
+
 
 ![raivBox product](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_product.jpeg)
