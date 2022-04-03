@@ -93,6 +93,7 @@ try:
             GPIO.output(led1pin, GPIO.LOW)
             GPIO.output(led2pin, GPIO.LOW)
             GPIO.cleanup()
+            os.system("echo '1' | tee flags/init.txt") # Flag that the system is initialized
             going = subprocess.Popen(['python3 buttons.py'],
                                   cwd=directory, shell=True)
             gone = True

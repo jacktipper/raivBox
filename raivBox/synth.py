@@ -610,7 +610,8 @@ def smooth(x, filter_size=3):
     return y.numpy()
 
 
-"""End the blinking process now that all dependencies are loaded."""
+"""End the LED blinking and OLED animation now that all dependencies are loaded."""
+os.system("echo '1' | tee flags/loaded.txt")
 blink.terminate()
 blink = None
 GPIO.output(led0pin, GPIO.HIGH)
@@ -631,11 +632,26 @@ try:
             # Restart the blink sequence child process.
             blink = Process(target=blinker)
             blink.start()
+            os.system("echo '1' | tee flags/gen.txt")
             
 
             # Audio Feature Extraction
+            # Load the input audio
             fs = RATE
             x, fs = librosa.load(INPUT_PATH, sr=fs, mono=True)
+            
+
+            # Safety check for input file that is too short
+            if len(x) < 4096:
+                # End blink sequence
+                blink.terminate()
+                blink = None
+                GPIO.output(led0pin, GPIO.HIGH)
+                os.system("echo '0' | tee flags/gen.txt")
+                # Archive the input audio and deactivate the `ready` flag
+                os.rename(INPUT_PATH, str('audio/archive/in_' + str(datetime.now())[0:19] + '.wav'))
+                os.remove(ready)
+                continue
 
 
             # Compute features.
@@ -805,6 +821,7 @@ try:
             blink.terminate()
             blink = None
             GPIO.output(led0pin, GPIO.HIGH)
+            os.system("echo '0' | tee flags/gen.txt")
 
 
             """Clear caches, archive the input audio, and deactivate the `ready` flag."""

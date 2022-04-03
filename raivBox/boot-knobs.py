@@ -115,9 +115,12 @@ def shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3):
     return sd_cmd
 
 
-# Initialize input and output volume reports
-os.system("echo '01' | tee flags/invol.txt")
+# Initialize input and output volume reports and flags
+os.system("echo '99' | tee flags/invol.txt")
 os.system("echo '01' | tee flags/outvol.txt")
+os.system("echo '0' | tee flags/init.txt")
+os.system("echo '0' | tee flags/loaded.txt")
+os.system("echo '0' | tee flags/gen.txt")
 
 
 powered_on = True
@@ -190,13 +193,13 @@ while powered_on:
         # Set the neural synthesizer model
         if set_model < 2:
             model = 'shutdown'
-        elif set_model <= 20:
+        elif set_model < 26:
             model = model_bank[0]
-        elif set_model <= 40:
+        elif set_model < 46:
             model = model_bank[1]
-        elif set_model <= 60:
+        elif set_model < 66:
             model = model_bank[2]
-        elif set_model <= 80:
+        elif set_model < 86:
             model = model_bank[3]
         else:
             model = model_bank[4]

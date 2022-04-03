@@ -457,6 +457,48 @@ while booting:
     booting = False
 
 
+"""Show a prompt on-screen for the user to initialize the synthesizer."""
+initialized = False
+while not initialized:
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    disp.image(image)
+    disp.display()
+    time.sleep(0.06)
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    draw.text((x, top),    "                      ", font=font, fill=255)
+    draw.text((x, top+8),  "   Tap both buttons   ", font=font, fill=255)
+    draw.text((x, top+16), "    simultaneously    ", font=font, fill=255)
+    draw.text((x, top+25), "                      ", font=font, fill=255)
+    disp.image(image)
+    disp.display()
+    time.sleep(0.48)
+    if int(subprocess.check_output("cat ~/Desktop/raivBox/flags/init.txt", shell=True).decode('ascii')):
+        initialized = True
+
+
+"""Show a loading animation during library load-in"""
+loaded = False
+while not loaded:
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    draw.text((x, top),    "                      ", font=font, fill=255)
+    draw.text((x, top+8),  "    Loading heavy     ", font=font, fill=255)
+    draw.text((x, top+16), "      libraries       ", font=font, fill=255)
+    draw.text((x, top+25), "                      ", font=font, fill=255)
+    disp.image(image)
+    disp.display()
+    time.sleep(0.24)
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+    draw.text((x, top),    "                      ", font=font, fill=255)
+    draw.text((x, top+8),  "     Loading heavy    ", font=font, fill=255)
+    draw.text((x, top+16), "       libraries      ", font=font, fill=255)
+    draw.text((x, top+25), "                      ", font=font, fill=255)
+    disp.image(image)
+    disp.display()
+    time.sleep(0.24)
+    if int(subprocess.check_output("cat ~/Desktop/raivBox/flags/loaded.txt", shell=True).decode('ascii')):
+        loaded = True
+
+
 """Now that the raivBox is powered up, start the core refresh loop and display system stats."""
 powered_on = True
 while powered_on:
@@ -493,50 +535,53 @@ while powered_on:
     else:
         # Display the current neural synthesizer model
         draw.text((x, top), str(" Model: " + Model.upper()), font=font, fill=255)
-
-        # Print the IP address
-        # Two examples here, wired and wireless
-        if str(get_ip_address('wlan0')) is not 'None':
-            draw.text((x, top+8), " IP:   " + str(get_ip_address('wlan0')),  font=font, fill=255)
+        GEN = int(subprocess.check_output("cat ~/Desktop/raivBox/flags/gen.txt", shell=True).decode('ascii'))
+        if GEN:
+            draw.text((x, top+16), "   AUDIO PROCESSING   ", font=font, fill=255)
         else:
-            if True:
-                # Draw the GPU usage as a bar graph
-                string_width, string_height = font.getsize(" GPU:  ")
-                # Figure out the width of the bar
-                full_bar_width = width-(x+string_width)-1
-                gpu_usage = get_gpu_usage()
-                # Avoid divide by zero
-                if gpu_usage == 0.0:
-                    gpu_usage = 0.001
-                draw_bar_width = int(full_bar_width*(gpu_usage/100))
-                draw.text((x, top+8), " GPU:  ", font=font, fill=255)
-                draw.rectangle((x+string_width, top+12, x+string_width +
-                                draw_bar_width, top+14), outline=1, fill=1)
+            # Print the IP address
+            # Two examples here, wired and wireless
+            if str(get_ip_address('wlan0')) is not "None\0":
+                draw.text((x, top+8), " IP:   " + str(get_ip_address('wlan0')),  font=font, fill=255)
             else:
-                """Note: This CPU usage option doesn't work as intended yet."""
-                # Draw the CPU usage as a bar graph
-                string_width, string_height = font.getsize(" CPU:  ")
-                # Figure out the width of the bar
-                full_bar_width = width-(x+string_width)-1
-                cpu_usage = get_cpu_usage()
-                # Avoid divide by zero
-                if cpu_usage == 0.0:
-                    cpu_usage = 0.001
-                draw_bar_width = int(full_bar_width*(cpu_usage/100))
-                draw.text((x, top+8), " CPU:  ", font=font, fill=255)
-                draw.rectangle((x+string_width, top+12, x+string_width +
-                                draw_bar_width, top+14), outline=1, fill=1)
+                if True:
+                    # Draw the GPU usage as a bar graph
+                    string_width, string_height = font.getsize(" GPU:  ")
+                    # Figure out the width of the bar
+                    full_bar_width = width-(x+string_width)-1
+                    gpu_usage = get_gpu_usage()
+                    # Avoid divide by zero
+                    if gpu_usage == 0.0:
+                        gpu_usage = 0.001
+                    draw_bar_width = int(full_bar_width*(gpu_usage/100))
+                    draw.text((x, top+8), " GPU:  ", font=font, fill=255)
+                    draw.rectangle((x+string_width, top+12, x+string_width +
+                                    draw_bar_width, top+14), outline=1, fill=1)
+                else:
+                    """Note: This CPU usage option doesn't work as intended yet."""
+                    # Draw the CPU usage as a bar graph
+                    string_width, string_height = font.getsize(" CPU:  ")
+                    # Figure out the width of the bar
+                    full_bar_width = width-(x+string_width)-1
+                    cpu_usage = get_cpu_usage()
+                    # Avoid divide by zero
+                    if cpu_usage == 0.0:
+                        cpu_usage = 0.001
+                    draw_bar_width = int(full_bar_width*(cpu_usage/100))
+                    draw.text((x, top+8), " CPU:  ", font=font, fill=255)
+                    draw.rectangle((x+string_width, top+12, x+string_width +
+                                    draw_bar_width, top+14), outline=1, fill=1)
 
 
-        # Shell scripts for system monitoring from here: 
-        # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-        cmd = "free -m | awk 'NR==2{printf \" Mem:  %.0f%% %s/%sM \", $3*100/$2, $3,$2 }'"
-        MemUsage = subprocess.check_output(cmd, shell=True)
-        cmd = "df -h | awk '$NF==\"/\"{printf \" Disk: %s %d/%dGB \", $5, $3,$2 }'"
-        Disk = subprocess.check_output(cmd, shell=True)
+            # Shell scripts for system monitoring from here: 
+            # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
+            cmd = "free -m | awk 'NR==2{printf \" Mem:  %.0f%% %s/%sM \", $3*100/$2, $3,$2 }'"
+            MemUsage = subprocess.check_output(cmd, shell=True)
+            cmd = "df -h | awk '$NF==\"/\"{printf \" Disk: %s %d/%dGB \", $5, $3,$2 }'"
+            Disk = subprocess.check_output(cmd, shell=True)
 
-        # Show the memory usage.
-        draw.text((x, top+16), str(MemUsage.decode('utf-8')), font=font, fill=255)
+            # Show the memory usage.
+            draw.text((x, top+16), str(MemUsage.decode('utf-8')), font=font, fill=255)
 
 
         """Extract the input and output volume settings from their respective flag files."""
@@ -561,6 +606,8 @@ while powered_on:
         if int(InVol) <= 50 or int(OutVol) <= 50:
             # Show the volume levels.
             draw.text((x, top+25), " IN: " + str(InVol) + "%    OUT: " + str(OutVol) + "%", font=font, fill=255)   
+        elif GEN:
+            draw.text((x, top+25), "                      ", font=font, fill=255)
         else:
             # Show the amount of disk being used.
             draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
