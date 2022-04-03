@@ -824,7 +824,7 @@ try:
             GPIO.output(led0pin, GPIO.HIGH)
             os.system("echo '0' | tee flags/gen.txt")
             # Save processing time for display
-            os.system("echo '%.1f' | tee flags/timer.txt" % (time.time() - start_time))
+            os.system("echo '%.2f' | tee flags/timer.txt" % (time.time() - start_time))
 
 
             """Clear caches, archive the input audio, and deactivate the `ready` flag."""
