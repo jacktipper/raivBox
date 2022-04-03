@@ -633,6 +633,7 @@ try:
             blink = Process(target=blinker)
             blink.start()
             os.system("echo '1' | tee flags/gen.txt")
+            start_time = time.time()
             
 
             # Audio Feature Extraction
@@ -822,6 +823,8 @@ try:
             blink = None
             GPIO.output(led0pin, GPIO.HIGH)
             os.system("echo '0' | tee flags/gen.txt")
+            # Save processing time for display
+            os.system("echo '%.1f' | tee flags/timer.txt" % (time.time() - start_time))
 
 
             """Clear caches, archive the input audio, and deactivate the `ready` flag."""

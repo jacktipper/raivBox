@@ -603,11 +603,17 @@ while powered_on:
         This allows the user to see when recording/output levels are too low, and thus assists 
         with hardware debugging.
         """
-        if int(InVol) <= 50 or int(OutVol) <= 50:
+        if int(InVol) < 51 or int(OutVol) < 51:
             # Show the volume levels.
             draw.text((x, top+25), " IN: " + str(InVol) + "%    OUT: " + str(OutVol) + "%", font=font, fill=255)   
         elif GEN:
             draw.text((x, top+25), "                      ", font=font, fill=255)
+        elif int(InVol) > 50 and int(OutVol) < 81:
+            try:
+                Timer = float(subprocess.check_output("cat ~/Desktop/raivBox/flags/timer.txt", shell=True).decode('ascii'))
+            except:
+                Timer = 999
+            draw.text((x, top+25), " Time: " + str(Timer) + " seconds", font=font, fill=255)
         else:
             # Show the amount of disk being used.
             draw.text((x, top+25), str(Disk.decode('utf-8')), font=font, fill=255)
