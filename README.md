@@ -16,7 +16,7 @@ Useful system stats and UI animations are displayed via `raivBox/stats.py`.
 
 All of the additional python files in this repository facilitate hardware-software interaction on the physical raivBox device.
 
-The `assets/` folder contains a few graphics, as well as the custom printed circuit board (PCB) .zip file and the three .stl files neede to 3D-print the raivBox housing components.
+The `assets/` folder contains a few graphics, as well as the custom printed circuit board (PCB) zip file and the three stl files neede to 3D-print the raivBox housing components.
 
 #
 
