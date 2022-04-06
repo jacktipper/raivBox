@@ -65,7 +65,7 @@ yes | sudo apt install python3-pip python3-pil
 yes | sudo apt install llvm-7 ; cd /usr/bin ; sudo ln llvm-config-7 llvm-config ; cd ~
 yes | sudo apt-get install git cmake puredata libatlas-base-dev gfortran libhdf5-serial-dev hdf5-tools python3-dev 
 yes | sudo apt-get install nano mlocate libpython3-dev python3-numpy libfreetype6-dev python3-setuptools
-yes | sudo apt-get install protobuf-compiler libprotobuf-dev openssl libssl-dev libcurl4-openssl-dev
+yes | sudo apt-get install protobuf-compiler libprotobuf-dev openssl libssl-dev libcurl4-openssl-dev sox
 yes | sudo apt-get install cython3 libxml2-dev libxslt1-dev curl libssl1.0-dev nodejs-dev node-gyp nodejs npm
 sudo npm install -g n ; sudo n stable ; sudo updatedb
 sudo -H pip3 install threadpoolctl dominate ; sudo -H pip3 install -U numpy setuptools ; yes | sudo apt-get upgrade

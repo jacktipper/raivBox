@@ -118,18 +118,20 @@ def shutdown_cmd(sd_cond_1, sd_cond_2, sd_cond_3):
 # Initialize input and output volume reports and flags
 os.system("echo '99' | tee flags/invol.txt")
 os.system("echo '01' | tee flags/outvol.txt")
-os.system("echo '0' | tee flags/init.txt")
 os.system("echo '0' | tee flags/loaded.txt")
+os.system("echo '0' | tee flags/timer.txt")
+os.system("echo '0' | tee flags/init.txt")
 os.system("echo '0' | tee flags/gen.txt")
 
 
 powered_on = True
-model_bank = ['acid', 
-              'saxophone',
-              'violin',
-              'trumpet',
-              'flute']
-prev_model = model_bank[0]
+# Retrieve models from the model-bank.txt file
+model_bank = open("models/model-bank.txt", "r").read().split("\n")
+# Account for accidental empty lines made by end users
+for i in range(len(model_bank)):
+    if model_bank[i] == '': model_bank.pop(i)
+if len(model_bank) > 5: model_bank = model_bank[0:5]
+prev_model = model_bank[4]
 
 while powered_on:
     # Assume the pots didn't move yet
