@@ -74,4 +74,4 @@ The `assets/` folder contains a few graphics, as well as the custom printed circ
 
 ![raivBox product](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_product.jpeg)
 
-![raivBox render](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_render.png)
+<!-- ![raivBox render](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_render.png) -->
