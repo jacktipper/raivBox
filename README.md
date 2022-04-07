@@ -18,6 +18,8 @@ All of the additional python files in this repository facilitate hardware-softwa
 
 The `assets/` folder contains a few graphics, as well as the custom printed circuit board (PCB) zip file and the three stl files neede to 3D-print the raivBox housing components.
 
+![raivBox software architecture](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_arch.png)
+
 #
 
 ### To replicate the basic functionality of this project, you will need:
