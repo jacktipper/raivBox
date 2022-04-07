@@ -86,10 +86,10 @@ sudo -H pip3 install adafruit-circuitpython-mcp3xxx Adafruit-Blinka
 cd ../ ; cd raivBox ; sudo chmod +x init-spi.sh ; sudo chmod +x init-pa.sh ; sudo chmod +x init-py.sh ; clear
 
 echo '--Creating OLED Status Display Service--' ; echo ; echo ; sleep 2
-sudo touch /etc/systemd/system/pioled-stats.service
-sudo cat ~/Desktop/raivBox/services/pioled-stats_service.txt > /etc/systemd/system/pioled-stats.service
-sudo chmod +x /etc/systemd/system/pioled-stats.service
-sudo systemctl enable pioled-stats ; sudo systemctl start pioled-stats.service ; clear
+sudo touch /etc/systemd/system/oled-stats.service
+sudo cat ~/Desktop/raivBox/services/oled-stats_service.txt > /etc/systemd/system/oled-stats.service
+sudo chmod +x /etc/systemd/system/oled-stats.service
+sudo systemctl enable oled-stats ; sudo systemctl start oled-stats.service ; clear
 
 echo '--Creating Analog Control systemd Modules--' ; echo ; echo ; sleep 2
 sudo touch /etc/systemd/user/boot-leds.service
