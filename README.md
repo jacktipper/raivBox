@@ -26,7 +26,7 @@ The `assets/` folder contains a few graphics, as well as the custom printed circ
 
 • 1x NVIDIA Jetson Nano 2GB Embedded Development Kit
 
-• 1x micro SD card (>=32GB)
+• 1x micro SD card (32GB+)
 
 • 1x compatible USB-C power supply (https://www.canakit.com/raspberry-pi-4-power-supply.html)
 
