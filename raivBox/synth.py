@@ -806,7 +806,24 @@ try:
             """Convert the neural outputs into audio data."""
             audio_gen = model.get_audio_from_outputs(outputs)
             audio_gen = audio_gen.numpy()[0]
-            audio_gen = audio_gen/np.max(audio_gen)
+            audio_gen = audio_gen/np.max(audio_gen) #normalize
+
+
+            """ * * * * * * * * * * * * * * * * * * * * *
+            * INSERT ADDITIONAL DSP CODE HERE AS DESIRED *
+            * * * * * * * * * * * * * * * * * * * * * * """
+
+            # # Simple clipping distortion example:
+            # threshold = 0.8
+            # for i in range(len(audio_gen)):
+            #     if np.abs(audio_gen[i]) > threshold:
+            #         audio_gen[i] = audio_gen[i] / np.abs(audio_gen[i]) * threshold
+
+
+
+
+            """ * * * * * * * * * * * * * * * * * * * * """
+            """ * * * * * * * * * * * * * * * * * * * * """
 
 
             """Save any previous audio outputs to the archive before overwriting."""
