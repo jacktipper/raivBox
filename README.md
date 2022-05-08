@@ -1,8 +1,10 @@
 # raivBox
 
-The raivBox is a standalone neural audio synthesis device based on Google Magenta's DDSP, with an NVIDIA Jetson Nano 2GB embedded development board at its core. This entire project is designed to be as affordable and replicable as possible, while still offering a robust neural synthesis experience outside of a traditional laptop/desktop computer environment. The raivBox is currently under development; this repository is not yet complete.
+The raivBox is a standalone neural audio synthesis device based on Google Magenta's DDSP, with an NVIDIA Jetson Nano 2GB embedded development board at its core. This entire project is designed to be as affordable and replicable as possible, while still offering a robust neural synthesis experience outside of a traditional laptop/desktop computer environment.
 
 ![raivBox logo](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_logo.png)
+
+Please refer to `assets/raivBox_thesis.pdf` for the full documentation of this project. See the *Methodology* section for detailed build instructions.
 
 The `raivBox/` folder contains all of the important files and scripts.
 
@@ -16,7 +18,7 @@ Useful system stats and UI animations are displayed via `raivBox/stats.py`.
 
 All of the additional python files in this repository facilitate hardware-software interaction on the physical raivBox device.
 
-The `assets/` folder contains a few graphics, as well as the custom printed circuit board (PCB) zip file and the three stl files needed to 3D-print the raivBox housing components.
+In addition to the master's thesis document, the `assets/` folder contains the custom printed circuit board (PCB) zip file and the three stl files needed to 3D-print the raivBox housing components, as well as a few pictures and renders.
 
 ![raivBox software architecture](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_arch.png)
 
