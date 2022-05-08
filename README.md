@@ -4,6 +4,12 @@ The raivBox is a standalone neural audio synthesis device based on Google Magent
 
 ![raivBox logo](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_logo.png)
 
+## Abstract
+
+Recent advances in deep learning-based audio creation are fueling the rise of a new approach to sound design: neural synthesis. Until now, robust neural synthesizers for musical sounds have been relegated to traditional desktop and cloud-based computing environments. Hosting these generative systems on low-cost devices will broaden offline and untethered access to this fledgling technology, helping to make way for a new era of modular music and audio experimentation. In this thesis, the implementation of neural waveform synthesis on a resource-limited embedded development platform is explored using a modified version of Google Magenta’s Differentiable Digital Signal Processing (DDSP) timbre transfer pipeline on an Nvidia Jetson Nano 2GB embedded prototyping board. Timbre transfer is a type of neural synthesis achieved by extracting audio features from an input signal and utilizing those data to generate a new waveform in the target timbre. This project introduces the raivBox: a functional neural synthesizer in the form of an affordable, unified hardware product. It features a physical control interface that provides responsive audio input and output, a selection of five neural timbre models to choose from, and a straightforward user experience that facilitates ease of use. The reworked neural synthesis pipeline produces sounds significantly faster than its predecessor while maintaining similarly compelling outputs. Qualitative research data indicate that users find the raivBox to be both intuitive and fun to interact with, and also suggest that it is perceived to be a valuable new tool for music creation and sound design. As this project is designed to be readily replicable by end users, the raivBox source code, build instructions, and a variety of audio examples are publicly available via the project’s GitHub repository.
+
+## Getting Started
+
 Please refer to `assets/raivBox_thesis.pdf` for the full documentation of this project. See the *Methodology* section for detailed build instructions.
 
 The `raivBox/` folder contains all of the important files and scripts.
@@ -19,6 +25,8 @@ Useful system stats and UI animations are displayed via `raivBox/stats.py`.
 All of the additional python files in this repository facilitate hardware-software interaction on the physical raivBox device.
 
 In addition to the master's thesis document, the `assets/` folder contains the custom printed circuit board (PCB) zip file and the three stl files needed to 3D-print the raivBox housing components, as well as a few pictures and renders.
+
+#
 
 ![raivBox software architecture](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_arch.png)
 
@@ -70,7 +78,6 @@ In addition to the master's thesis document, the `assets/` folder contains the c
 • 1x INIU USB-C power bank (https://smile.amazon.com/gp/product/B07CZDXDG8/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1)
 
 • 1x short USB-C male to USB-C male cable
-
 
 #
 
