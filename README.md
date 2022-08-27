@@ -84,3 +84,9 @@ In addition to the master's thesis document, the `assets/` folder contains the c
 ![raivBox product](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_product.jpeg)
 
 <!-- ![raivBox render](https://github.com/jacktipper/raivBox/blob/main/assets/raivBox_render.png) -->
+
+#
+
+### Disclaimer:
+
+It should be noted that this project commenced in late 2020 and the bulk of the development occurred in early 2021. The literature review, comparisons, and aspects of the evaluation methodology are limited by the time and labor constraints of the master's thesis process, and would benefit from a thorough update and revision. Many recent developments in this field are relevant to improving this work, and should not be overlooked by others interested in this topic.
